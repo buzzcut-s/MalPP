@@ -1,0 +1,69 @@
+---
+Checks: >
+  -*,
+  bugprone-*,
+  cert-*,
+  clang-*,  
+  cppcoreguidelines-*,  
+  google-*,
+  hicpp-*,
+  misc-*,
+  
+  modernize-*,
+  -modernize-use-trailing-return-type,
+  
+  performance-*,  
+  readability-*,
+  
+AnalyzeTemporaryDtors: false
+FormatStyle:     file
+User:            piyush
+
+CheckOptions:
+  - key:             modernize-use-auto.MinTypeNameLength
+    value:           '0'
+
+  - key:             modernize-use-default-member-init.UseAssignment
+    value:           'true'
+
+  - key:             performance-for-range-copy.WarnOnAllAutoCopies
+    value:           'true'
+    
+  - key:             google-readability-braces-around-statements.ShortStatementLines
+    value:           '2'
+  - key:             readability-braces-around-statements.ShortStatementLines
+    value:           '2'
+  - key:             hicpp-braces-around-statements.ShortStatementLines
+    value:           '2'
+    
+  - key:             readability-implicit-bool-conversion.AllowIntegerConditions
+    value:           'true'
+  - key:             readability-implicit-bool-conversion.AllowPointerConditions
+    value:           'true'
+    
+  - key:             readability-simplify-boolean-expr.ChainedConditionalAssignment
+    value:           'true'
+  - key:             readability-simplify-boolean-expr.ChainedConditionalReturn
+    value:           'true'
+    
+  - { key: readability-identifier-naming.ClassCase,              value: CamelCase  }
+  - { key: readability-identifier-naming.PrivateMemberPrefix,    value: m_         }
+  - { key: readability-identifier-naming.ClassMemberCase,        value: lower_case }
+  - { key: readability-identifier-naming.MemberConstantCase,     value: UPPER_CASE }
+  - { key: readability-identifier-naming.ClassMethodCase,        value: lower_case }
+  
+  - { key: readability-identifier-naming.StructCase,             value: CamelCase  }
+  - { key: readability-identifier-naming.EnumCase,               value: CamelCase  }
+  - { key: readability-identifier-naming.EnumConstantCase,       value: CamelCase  }
+  - { key: readability-identifier-naming.UnionCase,              value: CamelCase  }
+
+  - { key: readability-identifier-naming.FunctionCase,           value: lower_case }
+  - { key: readability-identifier-naming.ParameterCase,          value: lower_case }
+  - { key: readability-identifier-naming.TemplateParameterCase,  value: lower_case }
+  
+  - { key: readability-identifier-naming.VariableCase,           value: lower_case }
+  - { key: readability-identifier-naming.ConstexprVariableCase,  value: UPPER_CASE }
+  
+  - { key: readability-identifier-naming.GlobalConstantCase,     value: UPPER_CASE }
+  - { key: readability-identifier-naming.StaticConstantCase,     value: UPPER_CASE }
+...

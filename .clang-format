@@ -1,0 +1,79 @@
+# Common
+BasedOnStyle: Google
+
+# Indents
+# Explicitly disabling column limit for clang-format
+# Enforce a limit of 100 using cpplint
+ColumnLimit: 0 
+IndentWidth: 8
+TabWidth: 8
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
+AccessModifierOffset: -8
+
+# Include
+IncludeBlocks:   Regroup
+IncludeCategories:
+  - Regex:           '^"ui_.*'
+    Priority:        99
+    SortPriority:    0
+  - Regex:           '^<.*\.h>'
+    Priority:        1
+    SortPriority:    0
+  # C++ system headers (as of C++20).
+  - Regex:    '^[<"](algorithm|any|array|atomic|bitset|cassert|ccomplex|cctype|cerrno|cfenv|cfloat|charconv|chrono|cinttypes|ciso646|climits|clocale|cmath|codecvt|complex|condition_variable|csetjmp|csignal|cstdalign|cstdarg|cstdbool|cstddef|cstdint|cstdio|cstdlib|cstring|ctgmath|ctime|cuchar|cwchar|cwctype|deque|exception|execution|filesystem|forward_list|fstream|functional|future|initializer_list|iomanip|ios|iosfwd|iostream|istream|iterator|limits|list|locale|map|memory|memory_resource|mutex|new|numeric|optional|ostream|queue|random|ratio|regex|scoped_allocator|set|shared_mutex|sstream|stack|stdexcept|streambuf|string|string_view|strstream|system_error|thread|tuple|type_traits|typeindex|typeinfo|unordered_map|unordered_set|utility|valarray|variant|vector|concepts|coroutine|compare|version|source_location|format|span|ranges|bit|numbers|syncstream|stop_token|semaphore|latch|barrier)[">]$'
+    Priority: 2
+  - Regex:           '^<.*'
+    Priority:        3
+    SortPriority:    0
+  - Regex:           '.*'
+    Priority:        4
+    SortPriority:    0
+
+# The Google Style Guide only asks for consistency within a project
+# Explicitly choose "int& foo"
+DerivePointerAlignment: false
+PointerAlignment: Left
+
+# Breaks
+BreakConstructorInitializers: AfterColon
+BreakBeforeBinaryOperators: NonAssignment
+
+# One Line
+AllowShortBlocksOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: Inline
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+
+# Brace Breaks
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterCaseLabel: true
+  AfterClass: true
+  AfterControlStatement: Always
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterObjCDeclaration: true
+  AfterExternBlock: true
+  BeforeCatch: true
+  BeforeElse: true
+  BeforeWhile: true
+  SplitEmptyFunction: true
+  SplitEmptyNamespace: true
+  AfterStruct: false
+  AfterUnion: false
+  BeforeLambdaBody: false
+  IndentBraces: false
+  SplitEmptyRecord: false
+  
+# Align
+AlignConsecutiveAssignments: true
+AlignConsecutiveBitFields: true
+AlignConsecutiveDeclarations: true
+AlignConsecutiveMacros: true
+
+# Spaces
+SpaceAfterTemplateKeyword: false
+
+#EmptyLineAfterAccessModifier: Always
+#EmptyLineBeforeAccessModifier: Always
