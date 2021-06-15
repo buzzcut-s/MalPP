@@ -1,13 +1,13 @@
-#ifndef READLINE_H
-#define READLINE_H
+#ifndef READLINE_HPP
+#define READLINE_HPP
 
 #include <string>
 
-class Readline
+namespace readline
 {
-public:
-        static bool read(std::string& input, const char* prompt = "user> ",
-                         const char* history_path = "malpp_history");
-};
+bool read(std::string& input, const char* prompt = "user> ",
+          const char* history_path = "malpp_history");
 
-#endif  // READLINE_H
+};  // namespace readline
+
+#endif  // READLINE_HPP

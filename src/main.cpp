@@ -8,7 +8,7 @@ int main()
 {
         std::string input;
 
-        while (Readline::read(input))
+        while (readline::read(input))
         {
                 std::cout << rep(input) << "\n";
         }
