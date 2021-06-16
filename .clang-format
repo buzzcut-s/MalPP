@@ -38,6 +38,8 @@ PointerAlignment: Left
 # Breaks
 BreakConstructorInitializers: AfterColon
 BreakBeforeBinaryOperators: NonAssignment
+KeepEmptyLinesAtTheStartOfBlocks: true
+
 
 # One Line
 AllowShortBlocksOnASingleLine: Empty

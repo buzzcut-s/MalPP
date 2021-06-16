@@ -4,8 +4,9 @@
 
 namespace readline
 {
-bool read(std::string& input, const char* prompt = "user> ",
-          const char* history_path = "malpp_history")
+
+bool read(std::string& input, const char* prompt,
+          const char* history_path)
 {
         linenoise::LoadHistory(history_path);
 
