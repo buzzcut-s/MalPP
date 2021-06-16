@@ -3,5 +3,6 @@
 build/
 
 run
+malpp.code-workspace
 
 step*
