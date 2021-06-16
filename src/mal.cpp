@@ -3,22 +3,29 @@
 #include <iostream>
 #include <string>
 
-const std::string& READ(const std::string& input)
+#include "../include/Reader.hpp"
+#include "../include/printer.hpp"
+#include "../include/types.hpp"
+
+mal::Data* READ(std::string_view input)
 {
-        return input;
+        return read_str(input);
 }
 
-const std::string& EVAL(const std::string& ast)
+mal::Data* EVAL(mal::Data* value)
 {
-        return ast;
+        return value;
 }
 
-const std::string& PRINT(const std::string& ast)
+std::string PRINT(mal::Data* input)
 {
-        return ast;
+        return pr_str(input);
 }
 
-const std::string& rep(const std::string& input)
+std::string rep(std::string_view input)
 {
-        return PRINT(EVAL(READ(input)));
+        auto* ast    = READ(input);
+        auto* result = EVAL(ast);
+
+        return PRINT(result);
 }

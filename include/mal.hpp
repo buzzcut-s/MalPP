@@ -3,12 +3,14 @@
 
 #include <string>
 
-const std::string& READ(const std::string& input);
+#include "types.hpp"
 
-const std::string& EVAL(const std::string& ast);
+mal::Data* READ(std::string_view input);
 
-const std::string& PRINT(const std::string& ast);
+mal::Data* EVAL(mal::Data* value);
 
-const std::string& rep(const std::string& input);
+std::string PRINT(mal::Data* input);
+
+std::string rep(std::string_view input);
 
 #endif  // MAL_HPP

@@ -10,7 +10,7 @@ int main()
 
         while (readline::read(input))
         {
-                std::cout << rep(input) << "\n";
+                rep(input);
         }
 
         return 0;
