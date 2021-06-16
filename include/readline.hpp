@@ -6,8 +6,8 @@
 namespace readline
 {
 
-bool read(std::string& input, const char* prompt = "user> ",
-          const char* history_path = "malpp_history");
+bool read(std::string& input, const std::string& prompt = "user> ",
+          const std::string& history_path = "malpp_history");
 
 };  // namespace readline
 
