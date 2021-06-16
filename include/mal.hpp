@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "../include/Tokenizer.hpp"
+
 const std::string& READ(const std::string& input);
 
 const std::string& EVAL(const std::string& ast);

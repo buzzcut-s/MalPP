@@ -3,8 +3,16 @@
 #include <iostream>
 #include <string>
 
+#include "../include/Tokenizer.hpp"
+
 const std::string& READ(const std::string& input)
 {
+        Tokenizer t{input};
+
+        while (auto token = t.next())
+        {
+                std::cout << "[" << *token << "]\n";
+        }
         return input;
 }
 
