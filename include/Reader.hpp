@@ -14,10 +14,12 @@ class Reader
 public:
         explicit Reader(std::vector<std::string> tokens);
 
+        // TODO(piyush): Is optional really required? Although it's a nice to have
         std::optional<std::string> peek();
         std::optional<std::string> next();
 
 private:
+        // TODO(piyush): Can this be a string_view?
         std::vector<std::string>                 m_tokens;
         std::vector<std::string>::const_iterator m_index;
         std::vector<std::string>::const_iterator m_end;
