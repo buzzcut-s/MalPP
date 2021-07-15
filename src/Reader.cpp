@@ -60,17 +60,16 @@ auto read_form(Reader& reader) -> mal::Data*
         if (!token)
                 return nullptr;
 
-        if (token.value()[0] == '(')
+        auto type = token.value()[0];
+
+        if (type == '(')
                 return read_list(reader);
-
-        if (token.value()[0] == '[')
+        if (type == '[')
                 return read_vector(reader);
-
-        if (token.value()[0] == '{')
+        if (type == '{')
                 return read_hashmap(reader);
-
-        if (token.value()[0] == '\'' || token.value()[0] == '`')
-                return read_quoted(reader);
+        if (type == '\'' || type == '`' || type == '~')
+                return read_quoted(reader, type);
 
         return read_atom(reader);
 }
@@ -151,18 +150,19 @@ auto read_hashmap(Reader& reader) -> mal::Data*
         return nullptr;
 }
 
-auto read_quoted(Reader& reader) -> mal::Data*
+auto read_quoted(Reader& reader, char type) -> mal::Data*
 {
-        auto  type        = reader.peek();
         auto* quoted_list = new mal::List;
 
         reader.next();
 
         // TODO(piyush) Handle quotes with no next token
-        if (*type == "'")
+        if (type == '\'')
                 quoted_list->push(new mal::Symbol{"quote"});
-        else
+        else if (type == '`')
                 quoted_list->push(new mal::Symbol{"quasiquote"});
+        else
+                quoted_list->push(new mal::Symbol{"unquote"});
 
         quoted_list->push(read_form(reader));
 

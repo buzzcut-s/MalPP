@@ -62,6 +62,6 @@ auto read_vector(Reader& reader) -> mal::Data*;
 
 auto read_hashmap(Reader& reader) -> mal::Data*;
 
-auto read_quoted(Reader& reader) -> mal::Data*;
+auto read_quoted(Reader& reader, char type) -> mal::Data*;
 
 #endif  // READER_HPP
