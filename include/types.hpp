@@ -2,6 +2,7 @@
 #define TYPES_HPP
 
 #include <string>
+#include <utility>
 #include <variant>
 #include <vector>
 
@@ -35,9 +36,15 @@ private:
 class Symbol : public Data
 {
 public:
+        explicit Symbol(std::string symbol) :
+            m_symbol{std::move(symbol)}
+        {}
+
         ~Symbol() override = default;
 
         std::string format() override;
+
+        std::string symbol() const { return m_symbol; }
 
 private:
         std::string m_symbol;

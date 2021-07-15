@@ -14,14 +14,23 @@ std::string List::format()
                 out.append(value->format());
                 out.append(" ");
         }
-        out.back() = ')';
+
+        if (!m_list.empty())
+        {
+                out.back() = ')';
+        }
+        else
+        {
+                out.append(")");
+        }
+
         return out;
 }
 
 // TODO(piyush): implement
 std::string Symbol::format()
 {
-        return "OK";
+        return symbol();
 }
 
 }  // namespace mal

@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <memory>
+#include <string>
 #include <string_view>
 #include <utility>
 
@@ -14,7 +15,7 @@ Reader::Reader(std::vector<std::string> tokens) :
 {
 }
 
-bool Reader::eof()
+bool Reader::eof() const
 {
         return m_index == m_end;
 }
@@ -35,11 +36,20 @@ std::optional<std::string> Reader::next()
         return {};
 }
 
-std::vector<std::string> tokenize(std::string_view input)
+void Reader::print()
+{
+        int i = 0;
+        for (auto it = m_index; it < m_end; ++it)
+        {
+                std::cerr << i++ << " " << *it << "\n";
+        }
+}
+
+std::vector<std::string> tokenize(std::string input)
 {
         static const auto TOKEN_REGEX = std::regex(R"((~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]+))");
 
-        std::string str{input};
+        std::string str{std::move(input)};
         std::smatch result{};
 
         std::vector<std::string> out;
@@ -48,7 +58,7 @@ std::vector<std::string> tokenize(std::string_view input)
                 if ((result.str().front() == '"') && result.str().back() != '"')
                 {
                         // TODO(piyush): Handle this
-                        std::cout << "Mismatched quote\n";
+                        std::cout << "EOF\n";
                 }
                 else
                 {
@@ -61,29 +71,12 @@ std::vector<std::string> tokenize(std::string_view input)
         return out;
 }
 
-mal::Data* read_list(Reader& reader)
+// TODO(piyush): Order these definitions roughly by call order
+mal::Data* read_str(std::string input)
 {
-        reader.next();
-        // TODO(piyush): What is this...?
-        auto* list = new (mal::List);
+        auto reader = Reader(tokenize(std::move(input)));
 
-        while (auto token = reader.peek())
-        {
-                if (*token == ")")
-                {
-                        reader.next();
-                        break;
-                }
-                list->push(read_form(reader));
-        }
-
-        return list;
-}
-
-// TODO(piyush): Implement this
-mal::Data* read_atom(Reader& reader)
-{
-        reader.next();
+        // reader.print();
 
         return read_form(reader);
 }
@@ -95,6 +88,8 @@ mal::Data* read_form(Reader& reader)
         if (!token)
                 return nullptr;
 
+        // std::cerr << "-" << *token << "\n";
+
         // TODO(piyush): Is this the right way?
         if (token.value()[0] == '(')
                 return read_list(reader);
@@ -102,10 +97,28 @@ mal::Data* read_form(Reader& reader)
         return read_atom(reader);
 }
 
-// TODO(piyush): Order these definitions roughly by call order
-mal::Data* read_str(std::string_view input)
+mal::Data* read_list(Reader& reader)
 {
-        auto reader = Reader(tokenize(input));
+        reader.next();
 
-        return read_form(reader);
+        // TODO(piyush): What is this...?
+        auto* list = new mal::List;
+
+        while (auto token = reader.peek())
+        {
+                if (*token == ")")
+                {
+                        reader.next();
+                        return list;
+                }
+                list->push(read_form(reader));
+        }
+        std::cerr << "EOF\n";
+        return list;
+}
+
+// TODO(piyush): Implement this
+mal::Data* read_atom(Reader& reader)
+{
+        return new mal::Symbol{*reader.next()};
 }

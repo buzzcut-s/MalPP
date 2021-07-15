@@ -2,14 +2,15 @@
 
 #include <iostream>
 #include <string>
+#include <utility>
 
 #include "../include/Reader.hpp"
 #include "../include/printer.hpp"
 #include "../include/types.hpp"
 
-mal::Data* READ(std::string_view input)
+mal::Data* READ(std::string input)
 {
-        return read_str(input);
+        return read_str(std::move(input));
 }
 
 mal::Data* EVAL(mal::Data* value)
@@ -22,9 +23,9 @@ std::string PRINT(mal::Data* input)
         return pr_str(input);
 }
 
-std::string rep(std::string_view input)
+std::string rep(std::string input)
 {
-        auto* ast    = READ(input);
+        auto* ast    = READ(std::move(input));
         auto* result = EVAL(ast);
 
         return PRINT(result);

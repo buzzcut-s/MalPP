@@ -18,16 +18,18 @@ public:
         std::optional<std::string> peek();
         std::optional<std::string> next();
 
+        void print();
+
 private:
         // TODO(piyush): Can this be a string_view?
         std::vector<std::string>                 m_tokens;
         std::vector<std::string>::const_iterator m_index;
         std::vector<std::string>::const_iterator m_end;
 
-        bool eof();
+        bool eof() const;
 };
 
-std::vector<std::string> tokenize(std::string_view input);
+std::vector<std::string> tokenize(std::string input);
 
 mal::Data* read_form(Reader& reader);
 
@@ -35,6 +37,6 @@ mal::Data* read_list(Reader& reader);
 
 mal::Data* read_atom(Reader& reader);
 
-mal::Data* read_str(std::string_view input);
+mal::Data* read_str(std::string input);
 
 #endif  // READER_HPP

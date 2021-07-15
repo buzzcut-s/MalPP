@@ -10,7 +10,8 @@ int main()
 
         while (readline::read(input))
         {
-                rep(input);
+                auto out = rep(input);
+                std::cout << out << std::endl;
         }
 
         return 0;
