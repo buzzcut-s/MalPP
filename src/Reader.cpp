@@ -1,5 +1,6 @@
 #include "../include/Reader.hpp"
 
+#include <algorithm>
 #include <iostream>
 #include <optional>
 #include <regex>
@@ -18,10 +19,26 @@ auto tokenize(std::string input) -> std::vector<std::string>
         std::vector<std::string> out;
         while (regex_search(str, result, TOKEN_REGEX))
         {
-                if (result.str().front() == '"' && result.str().back() != '"')
-                        std::cerr << "unbalanced\n";
+                auto token = result.str();
+
+                // TODO(piyush) Make this more sensible
+                if (token.front() == '"')
+                {
+                        auto escape_count = std::count(token.cbegin(), token.cend(), '\\');
+                        if (token.size() == 1 || token.back() != '"'
+                            || (token[token.size() - 2] == '\\' && escape_count % 2 != 0))
+                        {
+                                std::cerr << "unbalanced";
+                        }
+                        else
+                        {
+                                out.push_back(result.str());
+                        }
+                }
                 else
+                {
                         out.push_back(result.str());
+                }
 
                 str = result.suffix();
         }
@@ -49,16 +66,19 @@ auto read_form(Reader& reader) -> mal::Data*
         if (token.value()[0] == '[')
                 return read_vector(reader);
 
+        if (token.value()[0] == '{')
+                return read_hashmap(reader);
+
         return read_atom(reader);
 }
 
-auto read_atom(Reader& reader) -> mal::Data*
+auto read_atom(Reader& reader) -> mal::Symbol*
 {
         auto* atom = new mal::Symbol{*reader.next()};
         return atom;
 }
 
-auto read_list(Reader& reader) -> mal::Data*
+auto read_list(Reader& reader) -> mal::List*
 {
         reader.next();
 
@@ -73,11 +93,11 @@ auto read_list(Reader& reader) -> mal::Data*
                 list->push(read_form(reader));
         }
 
-        std::cerr << "unbalanced\n";
-        return list;
+        std::cerr << "unbalanced";
+        return nullptr;
 }
 
-auto read_vector(Reader& reader) -> mal::Data*
+auto read_vector(Reader& reader) -> mal::Vector*
 {
         reader.next();
 
@@ -92,6 +112,37 @@ auto read_vector(Reader& reader) -> mal::Data*
                 vec->push(read_form(reader));
         }
 
-        std::cerr << "unbalanced\n";
-        return vec;
+        std::cerr << "unbalanced";
+        return nullptr;
+}
+
+auto read_hashmap(Reader& reader) -> mal::HashMap*
+{
+        reader.next();
+
+        auto* hashmap = new mal::HashMap;
+        while (auto token = reader.peek())
+        {
+                if (*token == "}")
+                {
+                        reader.next();
+                        return hashmap;
+                }
+
+                auto* key = read_form(reader);
+
+                token = reader.peek();
+                if (*token == "}")
+                {
+                        std::cerr << "hashmap without value";
+                        reader.next();
+                        return hashmap;
+                }
+
+                auto* value = read_form(reader);
+                hashmap->insert(key, value);
+        }
+
+        std::cerr << "unbalanced";
+        return nullptr;
 }

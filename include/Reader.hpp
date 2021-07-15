@@ -9,7 +9,11 @@
 namespace mal
 {
 class Data;
-}
+class Symbol;
+class List;
+class Vector;
+class HashMap;
+}  // namespace mal
 
 class Reader
 {
@@ -50,10 +54,12 @@ auto read_str(std::string input) -> mal::Data*;
 
 auto read_form(Reader& reader) -> mal::Data*;
 
-auto read_atom(Reader& reader) -> mal::Data*;
+auto read_atom(Reader& reader) -> mal::Symbol*;
 
-auto read_list(Reader& reader) -> mal::Data*;
+auto read_list(Reader& reader) -> mal::List*;
 
-auto read_vector(Reader& reader) -> mal::Data*;
+auto read_vector(Reader& reader) -> mal::Vector*;
+
+auto read_hashmap(Reader& reader) -> mal::HashMap*;
 
 #endif  // READER_HPP

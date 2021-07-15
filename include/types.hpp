@@ -1,7 +1,9 @@
 #ifndef TYPES_HPP
 #define TYPES_HPP
 
+#include <cstddef>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -94,6 +96,55 @@ public:
 
 private:
         std::vector<mal::Data*> m_vector;
+};
+
+class HashMap : public Data
+{
+public:
+        HashMap() = default;
+
+        HashMap(HashMap const& other) = default;
+        HashMap& operator=(HashMap const& other) = default;
+
+        HashMap(HashMap&& other) = default;
+        HashMap& operator=(HashMap&& other) = default;
+
+        ~HashMap() override = default;
+
+        [[nodiscard]] std::string format() const override;
+
+        void insert(mal::Data* key, mal::Data* value)
+        {
+                m_hashmap[key] = value;
+        }
+
+        [[nodiscard]] mal::Data* find(mal::Data* key) const
+        {
+                if (auto res = m_hashmap.find(key); res != m_hashmap.end())
+                        return res->second;
+                return nullptr;
+        }
+
+protected:
+        struct DataHasher
+        {
+                std::size_t operator()(const mal::Data* key) const noexcept
+                {
+                        return std::hash<std::string>{}(key->format());
+                }
+        };
+
+        struct DataPred
+        {
+                // TODO(piyush) Implement this, for real (equality)
+                constexpr bool operator()(const mal::Data* lhs, const mal::Data* rhs) const
+                {
+                        return lhs == rhs;
+                }
+        };
+
+private:
+        std::unordered_map<mal::Data*, mal::Data*, DataHasher, DataPred> m_hashmap;
 };
 
 }  // namespace mal
