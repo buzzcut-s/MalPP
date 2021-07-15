@@ -11,17 +11,57 @@ namespace mal
 class Data
 {
 public:
+        Data() = default;
+
+        Data(Data const& other) = default;
+        Data& operator=(Data const& other) = default;
+
+        Data(Data&& other) = default;
+        Data& operator=(Data&& other) = default;
+
         virtual ~Data() = default;
 
-        virtual std::string format() = 0;
+        [[nodiscard]] virtual std::string format() const = 0;
+};
+
+class Symbol : public Data
+{
+public:
+        Symbol(Symbol const& other) = default;
+        Symbol& operator=(Symbol const& other) = default;
+
+        Symbol(Symbol&& other) = default;
+        Symbol& operator=(Symbol&& other) = default;
+
+        ~Symbol() override = default;
+
+        explicit Symbol(std::string symbol) :
+            m_symbol{std::move(symbol)}
+        {}
+
+        [[nodiscard]] std::string format() const override
+        {
+                return m_symbol;
+        };
+
+private:
+        std::string m_symbol;
 };
 
 class List : public Data
 {
 public:
+        List() = default;
+
+        List(List const& other) = default;
+        List& operator=(List const& other) = default;
+
+        List(List&& other) = default;
+        List& operator=(List&& other) = default;
+
         ~List() override = default;
 
-        std::string format() override;
+        [[nodiscard]] std::string format() const override;
 
         void push(Data* value)
         {
@@ -30,23 +70,6 @@ public:
 
 private:
         std::vector<mal::Data*> m_list;
-};
-
-class Symbol : public Data
-{
-public:
-        explicit Symbol(std::string symbol) :
-            m_symbol{std::move(symbol)}
-        {}
-
-        ~Symbol() override = default;
-
-        std::string format() override;
-
-        [[nodiscard]] std::string symbol() const { return m_symbol; }
-
-private:
-        std::string m_symbol;
 };
 
 }  // namespace mal

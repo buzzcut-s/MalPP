@@ -6,12 +6,12 @@
 namespace mal
 {
 
-std::string List::format()
+std::string List::format() const
 {
         std::string out = "(";
-        for (auto* value : m_list)
+        for (auto* data : m_list)
         {
-                out.append(value->format());
+                out.append(data->format());
                 out.append(" ");
         }
 
@@ -21,12 +21,6 @@ std::string List::format()
                 out.append(")");
 
         return out;
-}
-
-// TODO(piyush): implement
-std::string Symbol::format()
-{
-        return symbol();
 }
 
 }  // namespace mal

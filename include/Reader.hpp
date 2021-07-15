@@ -3,6 +3,7 @@
 
 #include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace mal
@@ -13,11 +14,26 @@ class Data;
 class Reader
 {
 public:
-        explicit Reader(std::vector<std::string> tokens);
+        explicit Reader(std::vector<std::string> tokens) :
+            m_tokens(std::move(tokens)),
+            m_index(m_tokens.cbegin()),
+            m_end(m_tokens.cend())
+        {
+        }
 
-        // TODO(piyush): Is optional really required? Although it's a nice to have
-        [[nodiscard]] auto peek() const -> std::optional<std::string>;
-        auto               next() -> std::optional<std::string>;
+        [[nodiscard]] auto peek() const -> std::optional<std::string>
+        {
+                if (!eof())
+                        return *m_index;
+                return std::nullopt;
+        };
+
+        auto next() -> std::optional<std::string>
+        {
+                if (!eof())
+                        return *m_index++;
+                return std::nullopt;
+        };
 
 private:
         // TODO(piyush): Can this be a string_view?
@@ -25,7 +41,7 @@ private:
         std::vector<std::string>::const_iterator m_index;
         std::vector<std::string>::const_iterator m_end;
 
-        [[nodiscard]] bool eof() const;
+        [[nodiscard]] bool eof() const { return m_index == m_end; }
 };
 
 auto tokenize(std::string input) -> std::vector<std::string>;
