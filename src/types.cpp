@@ -16,13 +16,9 @@ std::string List::format()
         }
 
         if (!m_list.empty())
-        {
                 out.back() = ')';
-        }
         else
-        {
                 out.append(")");
-        }
 
         return out;
 }

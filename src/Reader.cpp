@@ -1,9 +1,9 @@
 #include "../include/Reader.hpp"
 
 #include <iostream>
-#include <memory>
+#include <optional>
+#include <regex>
 #include <string>
-#include <string_view>
 #include <utility>
 
 #include "../include/types.hpp"
@@ -15,12 +15,7 @@ Reader::Reader(std::vector<std::string> tokens) :
 {
 }
 
-bool Reader::eof() const
-{
-        return m_index == m_end;
-}
-
-std::optional<std::string> Reader::peek()
+auto Reader::peek() const -> std::optional<std::string>
 {
         if (!eof())
                 return *m_index;
@@ -28,7 +23,7 @@ std::optional<std::string> Reader::peek()
         return {};
 }
 
-std::optional<std::string> Reader::next()
+auto Reader::next() -> std::optional<std::string>
 {
         if (!eof())
                 return *m_index++;
@@ -36,16 +31,12 @@ std::optional<std::string> Reader::next()
         return {};
 }
 
-void Reader::print()
+bool Reader::eof() const
 {
-        int i = 0;
-        for (auto it = m_index; it < m_end; ++it)
-        {
-                std::cerr << i++ << " " << *it << "\n";
-        }
+        return m_index == m_end;
 }
 
-std::vector<std::string> tokenize(std::string input)
+auto tokenize(std::string input) -> std::vector<std::string>
 {
         static const auto TOKEN_REGEX = std::regex(R"((~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]+))");
 
@@ -56,14 +47,9 @@ std::vector<std::string> tokenize(std::string input)
         while (regex_search(str, result, TOKEN_REGEX))
         {
                 if ((result.str().front() == '"') && result.str().back() != '"')
-                {
-                        // TODO(piyush): Handle this
                         std::cout << "EOF\n";
-                }
                 else
-                {
                         out.push_back(result.str());
-                }
 
                 str = result.suffix();
         }
@@ -72,23 +58,19 @@ std::vector<std::string> tokenize(std::string input)
 }
 
 // TODO(piyush): Order these definitions roughly by call order
-mal::Data* read_str(std::string input)
+auto read_str(std::string input) -> mal::Data*
 {
         auto reader = Reader(tokenize(std::move(input)));
-
-        // reader.print();
 
         return read_form(reader);
 }
 
-mal::Data* read_form(Reader& reader)
+auto read_form(Reader& reader) -> mal::Data*
 {
         auto token = reader.peek();
 
         if (!token)
                 return nullptr;
-
-        // std::cerr << "-" << *token << "\n";
 
         // TODO(piyush): Is this the right way?
         if (token.value()[0] == '(')
@@ -97,7 +79,13 @@ mal::Data* read_form(Reader& reader)
         return read_atom(reader);
 }
 
-mal::Data* read_list(Reader& reader)
+// TODO(piyush): Implement this
+auto read_atom(Reader& reader) -> mal::Data*
+{
+        return new mal::Symbol{*reader.next()};
+}
+
+auto read_list(Reader& reader) -> mal::Data*
 {
         reader.next();
 
@@ -113,12 +101,7 @@ mal::Data* read_list(Reader& reader)
                 }
                 list->push(read_form(reader));
         }
+
         std::cerr << "EOF\n";
         return list;
-}
-
-// TODO(piyush): Implement this
-mal::Data* read_atom(Reader& reader)
-{
-        return new mal::Symbol{*reader.next()};
 }

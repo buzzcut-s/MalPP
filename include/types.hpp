@@ -3,7 +3,6 @@
 
 #include <string>
 #include <utility>
-#include <variant>
 #include <vector>
 
 namespace mal
@@ -44,11 +43,12 @@ public:
 
         std::string format() override;
 
-        std::string symbol() const { return m_symbol; }
+        [[nodiscard]] std::string symbol() const { return m_symbol; }
 
 private:
         std::string m_symbol;
 };
 
 }  // namespace mal
+
 #endif  // TYPES_HPP

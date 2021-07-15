@@ -60,13 +60,13 @@ BraceWrapping:
   BeforeCatch: true
   BeforeElse: true
   BeforeWhile: true
-  SplitEmptyFunction: true
-  SplitEmptyNamespace: true
   AfterStruct: true
   AfterUnion: false
   BeforeLambdaBody: false
   IndentBraces: false
+  SplitEmptyFunction: true
   SplitEmptyRecord: false
+  SplitEmptyNamespace: true
   
 # Align
 AlignConsecutiveAssignments: true
