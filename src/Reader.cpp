@@ -68,8 +68,8 @@ auto read_form(Reader& reader) -> mal::Data*
                 return read_vector(reader);
         if (type == '{')
                 return read_hashmap(reader);
-        if (type == '\'' || type == '`' || type == '~')
-                return read_quoted(reader, type);
+        if (type == '\'' || type == '`' || type == '~' || type == '@')
+                return read_special_form(reader, type);
 
         return read_atom(reader);
 }
@@ -150,21 +150,27 @@ auto read_hashmap(Reader& reader) -> mal::Data*
         return nullptr;
 }
 
-auto read_quoted(Reader& reader, char type) -> mal::Data*
+auto read_special_form(Reader& reader, char type) -> mal::Data*
 {
-        auto* quoted_list = new mal::List;
+        auto* special_list = new mal::List;
 
         reader.next();
 
-        // TODO(piyush) Handle quotes with no next token
         if (type == '\'')
-                quoted_list->push(new mal::Symbol{"quote"});
+                special_list->push(new mal::Symbol{"quote"});
         else if (type == '`')
-                quoted_list->push(new mal::Symbol{"quasiquote"});
-        else
-                quoted_list->push(new mal::Symbol{"unquote"});
+                special_list->push(new mal::Symbol{"quasiquote"});
+        else if (type == '~')
+                special_list->push(new mal::Symbol{"unquote"});
+        else if (type == '@')
+                special_list->push(new mal::Symbol{"deref"});
 
-        quoted_list->push(read_form(reader));
+        if (auto* val = read_form(reader); val)
+        {
+                special_list->push(val);
+                return special_list;
+        }
 
-        return quoted_list;
+        std::cerr << "unbalanced";
+        return nullptr;
 }
