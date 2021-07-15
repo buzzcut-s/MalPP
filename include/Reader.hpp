@@ -54,14 +54,14 @@ auto read_str(std::string input) -> mal::Data*;
 
 auto read_form(Reader& reader) -> mal::Data*;
 
-auto read_atom(Reader& reader) -> mal::Symbol*;
+auto read_atom(Reader& reader) -> mal::Data*;
 
-auto read_list(Reader& reader) -> mal::List*;
+auto read_list(Reader& reader) -> mal::Data*;
 
-auto read_vector(Reader& reader) -> mal::Vector*;
+auto read_vector(Reader& reader) -> mal::Data*;
 
-auto read_hashmap(Reader& reader) -> mal::HashMap*;
+auto read_hashmap(Reader& reader) -> mal::Data*;
 
-auto read_quote(Reader& reader) -> mal::List*;
+auto read_quote(Reader& reader) -> mal::Data*;
 
 #endif  // READER_HPP

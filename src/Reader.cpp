@@ -75,13 +75,13 @@ auto read_form(Reader& reader) -> mal::Data*
         return read_atom(reader);
 }
 
-auto read_atom(Reader& reader) -> mal::Symbol*
+auto read_atom(Reader& reader) -> mal::Data*
 {
         auto* atom = new mal::Symbol{*reader.next()};
         return atom;
 }
 
-auto read_list(Reader& reader) -> mal::List*
+auto read_list(Reader& reader) -> mal::Data*
 {
         reader.next();
 
@@ -100,7 +100,7 @@ auto read_list(Reader& reader) -> mal::List*
         return nullptr;
 }
 
-auto read_vector(Reader& reader) -> mal::Vector*
+auto read_vector(Reader& reader) -> mal::Data*
 {
         reader.next();
 
@@ -119,7 +119,7 @@ auto read_vector(Reader& reader) -> mal::Vector*
         return nullptr;
 }
 
-auto read_hashmap(Reader& reader) -> mal::HashMap*
+auto read_hashmap(Reader& reader) -> mal::Data*
 {
         reader.next();
 
@@ -151,7 +151,7 @@ auto read_hashmap(Reader& reader) -> mal::HashMap*
         return nullptr;
 }
 
-auto read_quote(Reader& reader) -> mal::List*
+auto read_quote(Reader& reader) -> mal::Data*
 {
         reader.next();
 
