@@ -62,4 +62,6 @@ auto read_vector(Reader& reader) -> mal::Vector*;
 
 auto read_hashmap(Reader& reader) -> mal::HashMap*;
 
+auto read_quote(Reader& reader) -> mal::List*;
+
 #endif  // READER_HPP

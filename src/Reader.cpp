@@ -69,6 +69,9 @@ auto read_form(Reader& reader) -> mal::Data*
         if (token.value()[0] == '{')
                 return read_hashmap(reader);
 
+        if (token.value()[0] == '\'')
+                return read_quote(reader);
+
         return read_atom(reader);
 }
 
@@ -134,9 +137,10 @@ auto read_hashmap(Reader& reader) -> mal::HashMap*
                 token = reader.peek();
                 if (*token == "}")
                 {
-                        std::cerr << "hashmap without value";
+                        // TODO(piyush) What do?
+                        std::cerr << "hashmap without value\n";
                         reader.next();
-                        return hashmap;
+                        return nullptr;
                 }
 
                 auto* value = read_form(reader);
@@ -145,4 +149,18 @@ auto read_hashmap(Reader& reader) -> mal::HashMap*
 
         std::cerr << "unbalanced";
         return nullptr;
+}
+
+auto read_quote(Reader& reader) -> mal::List*
+{
+        reader.next();
+
+        auto* quoted_list = new mal::List;
+
+        quoted_list->push(new mal::Symbol{"quote"});
+
+        // TODO(piyush) Handle quote with no next token
+        quoted_list->push(read_form(reader));
+
+        return quoted_list;
 }

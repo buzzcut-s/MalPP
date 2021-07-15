@@ -70,6 +70,11 @@ public:
                 m_list.push_back(value);
         }
 
+        [[nodiscard]] std::size_t size() const
+        {
+                return m_list.size();
+        }
+
 private:
         std::vector<mal::Data*> m_list;
 };
