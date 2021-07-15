@@ -64,4 +64,6 @@ auto read_hashmap(Reader& reader) -> mal::Data*;
 
 auto read_special_form(Reader& reader, char type) -> mal::Data*;
 
+auto read_with_meta(Reader& reader) -> mal::Data*;
+
 #endif  // READER_HPP

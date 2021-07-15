@@ -70,6 +70,8 @@ auto read_form(Reader& reader) -> mal::Data*
                 return read_hashmap(reader);
         if (type == '\'' || type == '`' || type == '~' || type == '@')
                 return read_special_form(reader, type);
+        if (type == '^')
+                return read_with_meta(reader);
 
         return read_atom(reader);
 }
@@ -152,16 +154,21 @@ auto read_hashmap(Reader& reader) -> mal::Data*
 
 auto read_special_form(Reader& reader, char type) -> mal::Data*
 {
-        auto* special_list = new mal::List;
-
+        bool unquoted = (reader.peek()->length() == 1);
         reader.next();
 
+        auto* special_list = new mal::List;
         if (type == '\'')
                 special_list->push(new mal::Symbol{"quote"});
         else if (type == '`')
                 special_list->push(new mal::Symbol{"quasiquote"});
         else if (type == '~')
-                special_list->push(new mal::Symbol{"unquote"});
+        {
+                if (unquoted)
+                        special_list->push(new mal::Symbol{"unquote"});
+                else
+                        special_list->push(new mal::Symbol{"splice-unquote"});
+        }
         else if (type == '@')
                 special_list->push(new mal::Symbol{"deref"});
 
@@ -169,6 +176,26 @@ auto read_special_form(Reader& reader, char type) -> mal::Data*
         {
                 special_list->push(val);
                 return special_list;
+        }
+
+        std::cerr << "unbalanced";
+        return nullptr;
+}
+
+auto read_with_meta(Reader& reader) -> mal::Data*
+{
+        reader.next();
+
+        auto* metadata_list = new mal::List;
+
+        auto* metadata = read_form(reader);
+        auto* value    = read_form(reader);
+        if (metadata && value)
+        {
+                metadata_list->push(new mal::Symbol{"with-meta"});
+                metadata_list->push(value);
+                metadata_list->push(metadata);
+                return metadata_list;
         }
 
         std::cerr << "unbalanced";
