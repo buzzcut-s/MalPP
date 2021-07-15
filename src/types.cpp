@@ -23,4 +23,21 @@ std::string List::format() const
         return out;
 }
 
+std::string Vector::format() const
+{
+        std::string out = "[";
+        for (auto* data : m_vector)
+        {
+                out.append(data->format());
+                out.append(" ");
+        }
+
+        if (!m_vector.empty())
+                out.back() = ']';
+        else
+                out.append("]");
+
+        return out;
+}
+
 }  // namespace mal

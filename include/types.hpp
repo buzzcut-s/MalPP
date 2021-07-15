@@ -72,6 +72,30 @@ private:
         std::vector<mal::Data*> m_list;
 };
 
+class Vector : public Data
+{
+public:
+        Vector() = default;
+
+        Vector(Vector const& other) = default;
+        Vector& operator=(Vector const& other) = default;
+
+        Vector(Vector&& other) = default;
+        Vector& operator=(Vector&& other) = default;
+
+        ~Vector() override = default;
+
+        [[nodiscard]] std::string format() const override;
+
+        void push(Data* value)
+        {
+                m_vector.push_back(value);
+        }
+
+private:
+        std::vector<mal::Data*> m_vector;
+};
+
 }  // namespace mal
 
 #endif  // TYPES_HPP

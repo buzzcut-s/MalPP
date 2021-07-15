@@ -54,4 +54,6 @@ auto read_atom(Reader& reader) -> mal::Data*;
 
 auto read_list(Reader& reader) -> mal::Data*;
 
+auto read_vector(Reader& reader) -> mal::Data*;
+
 #endif  // READER_HPP
