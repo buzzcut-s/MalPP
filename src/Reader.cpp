@@ -72,6 +72,9 @@ auto read_form(Reader& reader) -> mal::Data*
         if (token.value()[0] == '\'')
                 return read_quote(reader);
 
+        if (token.value()[0] == '`')
+                return read_quasiquote(reader);
+
         return read_atom(reader);
 }
 
@@ -163,4 +166,18 @@ auto read_quote(Reader& reader) -> mal::Data*
         quoted_list->push(read_form(reader));
 
         return quoted_list;
+}
+
+auto read_quasiquote(Reader& reader) -> mal::Data*
+{
+        reader.next();
+
+        auto* quasiquoted_list = new mal::List;
+
+        quasiquoted_list->push(new mal::Symbol{"quasiquote"});
+
+        // TODO(piyush) Handle quasiquote with no next token
+        quasiquoted_list->push(read_form(reader));
+
+        return quasiquoted_list;
 }

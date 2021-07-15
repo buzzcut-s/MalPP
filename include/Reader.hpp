@@ -64,4 +64,6 @@ auto read_hashmap(Reader& reader) -> mal::Data*;
 
 auto read_quote(Reader& reader) -> mal::Data*;
 
+auto read_quasiquote(Reader& reader) -> mal::Data*;
+
 #endif  // READER_HPP
