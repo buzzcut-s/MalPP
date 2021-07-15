@@ -5,7 +5,10 @@
 #include <string>
 #include <vector>
 
-#include "types.hpp"
+namespace mal
+{
+class Data;
+}
 
 class Reader
 {

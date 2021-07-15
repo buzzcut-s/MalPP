@@ -3,7 +3,10 @@
 
 #include <string>
 
-#include "types.hpp"
+namespace mal
+{
+class Data;
+}
 
 std::string pr_str(mal::Data* value);
 

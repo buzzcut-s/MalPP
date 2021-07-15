@@ -3,7 +3,10 @@
 
 #include <string>
 
-#include "types.hpp"
+namespace mal
+{
+class Data;
+}
 
 mal::Data* READ(std::string input);
 
