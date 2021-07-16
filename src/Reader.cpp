@@ -186,12 +186,11 @@ auto read_with_meta(Reader& reader) -> mal::Data*
 {
         reader.next();
 
-        auto* metadata_list = new mal::List;
-
         auto* metadata = read_form(reader);
         auto* value    = read_form(reader);
         if (metadata && value)
         {
+                auto* metadata_list = new mal::List;
                 metadata_list->push(new mal::Symbol{"with-meta"});
                 metadata_list->push(value);
                 metadata_list->push(metadata);

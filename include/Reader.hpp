@@ -9,10 +9,6 @@
 namespace mal
 {
 class Data;
-class Symbol;
-class List;
-class Vector;
-class HashMap;
 }  // namespace mal
 
 class Reader
