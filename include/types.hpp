@@ -11,6 +11,10 @@ namespace mal
 
 class Data
 {
+        // Can't implement an evaluate() pure virtual here because we want to recursively call EVAL
+        // Pretty sure we'll have to do shitty stuff to return actual types in eval_ast...
+        // static_cast imminent
+
 public:
         Data() = default;
 
@@ -39,6 +43,27 @@ public:
         explicit Integer(int int_value) :
             m_int_value{int_value}
         {}
+
+        // TODO(piyush) This does look pretty nice, is it?
+        int operator+(const Integer& rhs) const
+        {
+                return m_int_value + rhs.m_int_value;
+        }
+
+        int operator-(const Integer& rhs) const
+        {
+                return m_int_value - rhs.m_int_value;
+        }
+
+        int operator*(const Integer& rhs) const
+        {
+                return m_int_value * rhs.m_int_value;
+        }
+
+        int operator/(const Integer& rhs) const
+        {
+                return m_int_value / rhs.m_int_value;
+        }
 
         [[nodiscard]] std::string format() const override
         {
@@ -179,6 +204,7 @@ public:
         }
 
 protected:
+        // TODO(piyush) Can use these objects for our symbol : lambda map
         struct DataHasher
         {
                 std::size_t operator()(const mal::Data* key) const noexcept
@@ -190,9 +216,10 @@ protected:
         struct DataPred
         {
                 // TODO(piyush) Implement this, for real (equality)
-                constexpr bool operator()(const mal::Data* lhs, const mal::Data* rhs) const
+                bool operator()(const mal::Data* lhs, const mal::Data* rhs) const
                 {
-                        return lhs == rhs;
+                        // TODO(piyush) Changed this to check with string values. Ok?
+                        return lhs->format() == rhs->format();
                 }
         };
 

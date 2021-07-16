@@ -9,7 +9,7 @@
 namespace mal
 {
 class Data;
-}  // namespace mal
+}
 
 class Reader
 {

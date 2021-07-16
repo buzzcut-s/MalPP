@@ -61,7 +61,7 @@ auto read_form(Reader& reader) -> mal::Data*
         if (!token)
                 return nullptr;
 
-        auto type = token.value()[0];
+        auto type = token.value().front();
 
         if (type == '(')
                 return read_list(reader);
@@ -79,7 +79,8 @@ auto read_form(Reader& reader) -> mal::Data*
 
 auto read_atom(Reader& reader) -> mal::Data*
 {
-        auto token = *reader.next();
+        auto token = reader.peek().value();
+        reader.next();
 
         if (token.front() == '"')
                 return new mal::String{token};
