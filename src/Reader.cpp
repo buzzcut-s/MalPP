@@ -1,6 +1,7 @@
 #include "../include/Reader.hpp"
 
 #include <algorithm>
+#include <charconv>
 #include <iostream>
 #include <optional>
 #include <regex>
@@ -78,8 +79,17 @@ auto read_form(Reader& reader) -> mal::Data*
 
 auto read_atom(Reader& reader) -> mal::Data*
 {
-        auto* atom = new mal::Symbol{*reader.next()};
-        return atom;
+        auto token = *reader.next();
+
+        int int_value{};
+        if (const auto [p, ec] = std::from_chars(token.data(), token.data() + token.size(),
+                                                 int_value);
+            ec == std::errc())
+        {
+                return new mal::Integer{int_value};
+        }
+
+        return new mal::Symbol{token};
 }
 
 auto read_list(Reader& reader) -> mal::Data*

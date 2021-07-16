@@ -25,6 +25,30 @@ public:
         [[nodiscard]] virtual std::string format() const = 0;
 };
 
+class Integer : public Data
+{
+public:
+        Integer(Integer const& other) = default;
+        Integer& operator=(Integer const& other) = default;
+
+        Integer(Integer&& other) = default;
+        Integer& operator=(Integer&& other) = default;
+
+        ~Integer() override = default;
+
+        explicit Integer(int int_value) :
+            m_int_value{int_value}
+        {}
+
+        [[nodiscard]] std::string format() const override
+        {
+                return std::to_string(m_int_value);
+        };
+
+private:
+        int m_int_value;
+};
+
 class Symbol : public Data
 {
 public:
