@@ -70,7 +70,32 @@ public:
         };
 
 private:
+        // TODO(piyush) char?
         std::string m_symbol;
+};
+
+class String : public Data
+{
+public:
+        String(String const& other) = default;
+        String& operator=(String const& other) = default;
+
+        String(String&& other) = default;
+        String& operator=(String&& other) = default;
+
+        ~String() override = default;
+
+        explicit String(std::string symbol) :
+            m_string{std::move(symbol)}
+        {}
+
+        [[nodiscard]] std::string format() const override
+        {
+                return m_string;
+        };
+
+private:
+        std::string m_string;
 };
 
 class List : public Data

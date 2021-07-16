@@ -81,6 +81,9 @@ auto read_atom(Reader& reader) -> mal::Data*
 {
         auto token = *reader.next();
 
+        if (token.front() == '"')
+                return new mal::String{token};
+
         int int_value{};
         if (const auto [p, ec] = std::from_chars(token.data(), token.data() + token.size(),
                                                  int_value);
