@@ -1,7 +1,6 @@
 #ifndef TYPES_HPP
 #define TYPES_HPP
 
-#include <cstddef>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -70,7 +69,7 @@ public:
                 m_list.push_back(value);
         }
 
-        [[nodiscard]] std::size_t size() const
+        [[nodiscard]] size_t size() const
         {
                 return m_list.size();
         }
