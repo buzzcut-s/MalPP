@@ -30,7 +30,7 @@ public:
                 return std::nullopt;
         };
 
-        auto next() -> std::optional<std::string>
+        [[nodiscard]] auto next() -> std::optional<std::string>
         {
                 if (!eof())
                         return *m_index++;
