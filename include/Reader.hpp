@@ -25,15 +25,13 @@ public:
 
         [[nodiscard]] auto peek() const -> std::optional<std::string>
         {
-                if (!eof())
-                        return *m_index;
+                if (!eof()) return *m_index;
                 return std::nullopt;
         };
 
         [[nodiscard]] auto next() -> std::optional<std::string>
         {
-                if (!eof())
-                        return *m_index++;
+                if (!eof()) return *m_index++;
                 return std::nullopt;
         };
 
@@ -44,9 +42,9 @@ public:
 
 private:
         // TODO(piyush): Can this be a string_view?
-        std::vector<std::string>                 m_tokens;
-        std::vector<std::string>::const_iterator m_index;
-        std::vector<std::string>::const_iterator m_end;
+        const std::vector<std::string>                 m_tokens;
+        std::vector<std::string>::const_iterator       m_index;
+        const std::vector<std::string>::const_iterator m_end;
 
         [[nodiscard]] bool eof() const { return m_index == m_end; }
 };
