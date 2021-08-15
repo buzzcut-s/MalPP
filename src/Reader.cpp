@@ -19,13 +19,14 @@ auto tokenize(std::string input) -> std::vector<std::string>
         std::smatch result{};
 
         std::vector<std::string> out;
-        while (regex_search(str, result, TOKEN_REGEX))
+        while (std::regex_search(str, result, TOKEN_REGEX))
         {
                 const auto token = result.str();
 
                 // TODO(piyush) Make this more sensible
                 if (token.front() == '"')
                 {
+                        // TODO(piyush) Can easily reduce scope of this std::count().
                         auto escape_count = std::count(token.cbegin(), token.cend(), '\\');
                         if (token.size() == 1 || token.back() != '"'
                             || (token[token.size() - 2] == '\\' && escape_count % 2 != 0))
@@ -34,12 +35,12 @@ auto tokenize(std::string input) -> std::vector<std::string>
                         }
                         else
                         {
-                                out.push_back(result.str());
+                                out.emplace_back(result.str());
                         }
                 }
                 else
                 {
-                        out.push_back(result.str());
+                        out.emplace_back(result.str());
                 }
 
                 str = result.suffix();
@@ -71,7 +72,7 @@ auto read_form(Reader& reader) -> mal::DataPtr
         if (type == '{')
                 return read_hashmap(reader);
         if (type == '\'' || type == '`' || type == '~' || type == '@')
-                return read_special_form(reader, type);
+                return read_special_form(reader);
         if (type == '^')
                 return read_with_meta(reader);
 
@@ -168,9 +169,10 @@ auto read_hashmap(Reader& reader) -> mal::DataPtr
         return nullptr;
 }
 
-auto read_special_form(Reader& reader, const char type) -> mal::DataPtr
+auto read_special_form(Reader& reader) -> mal::DataPtr
 {
-        const bool unquoted = (reader.peek()->length() == 1);
+        const auto token = reader.peek();
+        const char type  = token.value().front();
         reader.consume();
 
         auto special_list = std::make_unique<mal::List>();
@@ -180,6 +182,7 @@ auto read_special_form(Reader& reader, const char type) -> mal::DataPtr
                 special_list->push(std::make_unique<mal::Symbol>("quasiquote"));
         else if (type == '~')
         {
+                const bool unquoted = (token.value().length() == 1);
                 if (unquoted)
                         special_list->push(std::make_unique<mal::Symbol>("unquote"));
                 else

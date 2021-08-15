@@ -44,37 +44,37 @@ public:
         ~Integer() override = default;
 
         explicit Integer(int int_value) :
-            m_int_value{int_value}
+            m_int{int_value}
         {}
 
         // TODO(piyush) This does look pretty nice, is it?
         int operator+(const Integer& rhs) const
         {
-                return m_int_value + rhs.m_int_value;
+                return m_int + rhs.m_int;
         }
 
         int operator-(const Integer& rhs) const
         {
-                return m_int_value - rhs.m_int_value;
+                return m_int - rhs.m_int;
         }
 
         int operator*(const Integer& rhs) const
         {
-                return m_int_value * rhs.m_int_value;
+                return m_int * rhs.m_int;
         }
 
         int operator/(const Integer& rhs) const
         {
-                return m_int_value / rhs.m_int_value;
+                return m_int / rhs.m_int;
         }
 
         [[nodiscard]] std::string format() const override
         {
-                return std::to_string(m_int_value);
-        };
+                return std::to_string(m_int);
+        }
 
 private:
-        int m_int_value;
+        int m_int;
 };
 
 class Symbol : public Data
@@ -95,7 +95,7 @@ public:
         [[nodiscard]] std::string format() const override
         {
                 return m_symbol;
-        };
+        }
 
 private:
         // TODO(piyush) char?
@@ -120,7 +120,7 @@ public:
         [[nodiscard]] std::string format() const override
         {
                 return m_string;
-        };
+        }
 
 private:
         std::string m_string;
@@ -201,7 +201,7 @@ public:
 
         [[nodiscard]] mal::Data* find(DataPtr key) const
         {
-                if (auto res = m_hashmap.find(key); res != m_hashmap.end())
+                if (auto res = m_hashmap.find(key); res != m_hashmap.cend())
                         return res->second.get();
                 return nullptr;
         }

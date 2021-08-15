@@ -27,13 +27,13 @@ public:
         {
                 if (!eof()) return *m_index;
                 return std::nullopt;
-        };
+        }
 
         [[nodiscard]] auto next() -> std::optional<std::string>
         {
                 if (!eof()) return *m_index++;
                 return std::nullopt;
-        };
+        }
 
         void consume()
         {
@@ -63,7 +63,7 @@ auto read_vector(Reader& reader) -> mal::DataPtr;
 
 auto read_hashmap(Reader& reader) -> mal::DataPtr;
 
-auto read_special_form(Reader& reader, char type) -> mal::DataPtr;
+auto read_special_form(Reader& reader) -> mal::DataPtr;
 
 auto read_with_meta(Reader& reader) -> mal::DataPtr;
 
