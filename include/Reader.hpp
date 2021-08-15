@@ -35,6 +35,11 @@ public:
                 return std::nullopt;
         };
 
+        void consume()
+        {
+                if (!eof()) ++m_index;
+        }
+
 private:
         // TODO(piyush): Can this be a string_view?
         std::vector<std::string>                 m_tokens;

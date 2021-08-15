@@ -20,7 +20,7 @@ auto tokenize(std::string input) -> std::vector<std::string>
         std::vector<std::string> out;
         while (regex_search(str, result, TOKEN_REGEX))
         {
-                auto token = result.str();
+                const auto token = result.str();
 
                 // TODO(piyush) Make this more sensible
                 if (token.front() == '"')
@@ -56,12 +56,12 @@ auto read_str(std::string input) -> mal::Data*
 
 auto read_form(Reader& reader) -> mal::Data*
 {
-        auto token = reader.peek();
+        const auto token = reader.peek();
 
         if (!token)
                 return nullptr;
 
-        auto type = token.value().front();
+        const auto type = token.value().front();
 
         if (type == '(')
                 return read_list(reader);
@@ -79,8 +79,8 @@ auto read_form(Reader& reader) -> mal::Data*
 
 auto read_atom(Reader& reader) -> mal::Data*
 {
-        auto token = reader.peek().value();
-        reader.next();
+        const auto token = reader.peek().value();
+        reader.consume();
 
         if (token.front() == '"')
                 return new mal::String{token};
@@ -98,14 +98,14 @@ auto read_atom(Reader& reader) -> mal::Data*
 
 auto read_list(Reader& reader) -> mal::Data*
 {
-        reader.next();
+        reader.consume();
 
         auto* list = new mal::List;
         while (auto token = reader.peek())
         {
                 if (*token == ")")
                 {
-                        reader.next();
+                        reader.consume();
                         return list;
                 }
                 list->push(read_form(reader));
@@ -117,14 +117,14 @@ auto read_list(Reader& reader) -> mal::Data*
 
 auto read_vector(Reader& reader) -> mal::Data*
 {
-        reader.next();
+        reader.consume();
 
         auto* vec = new mal::Vector;
         while (auto token = reader.peek())
         {
                 if (*token == "]")
                 {
-                        reader.next();
+                        reader.consume();
                         return vec;
                 }
                 vec->push(read_form(reader));
@@ -136,14 +136,14 @@ auto read_vector(Reader& reader) -> mal::Data*
 
 auto read_hashmap(Reader& reader) -> mal::Data*
 {
-        reader.next();
+        reader.consume();
 
         auto* hashmap = new mal::HashMap;
         while (auto token = reader.peek())
         {
                 if (*token == "}")
                 {
-                        reader.next();
+                        reader.consume();
                         return hashmap;
                 }
 
@@ -154,7 +154,7 @@ auto read_hashmap(Reader& reader) -> mal::Data*
                 {
                         // TODO(piyush) What do?
                         std::cerr << "hashmap without value\n";
-                        reader.next();
+                        reader.consume();
                         return nullptr;
                 }
 
@@ -166,10 +166,10 @@ auto read_hashmap(Reader& reader) -> mal::Data*
         return nullptr;
 }
 
-auto read_special_form(Reader& reader, char type) -> mal::Data*
+auto read_special_form(Reader& reader, const char type) -> mal::Data*
 {
-        bool unquoted = (reader.peek()->length() == 1);
-        reader.next();
+        const bool unquoted = (reader.peek()->length() == 1);
+        reader.consume();
 
         auto* special_list = new mal::List;
         if (type == '\'')
@@ -198,7 +198,7 @@ auto read_special_form(Reader& reader, char type) -> mal::Data*
 
 auto read_with_meta(Reader& reader) -> mal::Data*
 {
-        reader.next();
+        reader.consume();
 
         auto* metadata = read_form(reader);
         auto* value    = read_form(reader);
