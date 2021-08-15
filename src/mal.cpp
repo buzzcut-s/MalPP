@@ -8,20 +8,20 @@
 #include "../include/printer.hpp"
 #include "../include/types.hpp"
 
-mal::Data* READ(std::string input)
+std::unique_ptr<mal::Data> READ(std::string input)
 {
         return read_str(std::move(input));
 }
 
 // TODO(piyush) Implement this.
-mal::Data* EVAL(mal::Data* ast, const repl_env& env)
+std::unique_ptr<mal::Data> EVAL(std::unique_ptr<mal::Data> ast, const repl_env& env)
 {
-        auto evaluated = eval_ast(ast, env);
+        auto evaluated = eval_ast(std::move(ast), env);
         return evaluated;
 }
 
 // TODO(piyush) Implement this.
-mal::Data* eval_ast(mal::Data* ast, const repl_env& env)
+std::unique_ptr<mal::Data> eval_ast(std::unique_ptr<mal::Data> ast, const repl_env& env)
 {
         // TODO(piyush) This is the trickiest part yet
         // TODO(piyush) How to pass arguments to lambda from env?????
@@ -31,9 +31,9 @@ mal::Data* eval_ast(mal::Data* ast, const repl_env& env)
         return ast;
 }
 
-std::string PRINT(mal::Data* input)
+std::string PRINT(std::unique_ptr<mal::Data> input)
 {
-        return pr_str(input);
+        return pr_str(std::move(input));
 }
 
 std::string rep(std::string input)
@@ -70,8 +70,8 @@ std::string rep(std::string input)
             {new mal::Symbol{"/"}, DIVIDE_LAMBDA},
         };
 
-        auto* ast    = READ(std::move(input));
-        auto* result = EVAL(ast, ENV);
+        auto ast    = READ(std::move(input));
+        auto result = EVAL(std::move(ast), ENV);
 
-        return PRINT(result);
+        return PRINT(std::move(result));
 }

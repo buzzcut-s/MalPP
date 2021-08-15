@@ -1,6 +1,7 @@
 #ifndef TYPES_HPP
 #define TYPES_HPP
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -138,9 +139,9 @@ public:
 
         [[nodiscard]] std::string format() const override;
 
-        void push(Data* value)
+        void push(std::unique_ptr<mal::Data> value)
         {
-                m_list.push_back(value);
+                m_list.push_back(std::move(value));
         }
 
         [[nodiscard]] size_t size() const
@@ -149,7 +150,7 @@ public:
         }
 
 private:
-        std::vector<mal::Data*> m_list;
+        std::vector<std::unique_ptr<mal::Data>> m_list;
 };
 
 class Vector : public Data
@@ -167,13 +168,13 @@ public:
 
         [[nodiscard]] std::string format() const override;
 
-        void push(Data* value)
+        void push(std::unique_ptr<mal::Data> value)
         {
-                m_vector.push_back(value);
+                m_vector.push_back(std::move(value));
         }
 
 private:
-        std::vector<mal::Data*> m_vector;
+        std::vector<std::unique_ptr<mal::Data>> m_vector;
 };
 
 class HashMap : public Data
@@ -191,15 +192,15 @@ public:
 
         [[nodiscard]] std::string format() const override;
 
-        void insert(mal::Data* key, mal::Data* value)
+        void insert(std::unique_ptr<mal::Data> key, std::unique_ptr<mal::Data> value)
         {
-                m_hashmap[key] = value;
+                m_hashmap.emplace(std::move(key), std::move(value));
         }
 
-        [[nodiscard]] mal::Data* find(mal::Data* key) const
+        [[nodiscard]] mal::Data* find(std::unique_ptr<mal::Data> key) const
         {
                 if (auto res = m_hashmap.find(key); res != m_hashmap.end())
-                        return res->second;
+                        return res->second.get();
                 return nullptr;
         }
 
@@ -207,7 +208,7 @@ protected:
         // TODO(piyush) Can use these objects for our symbol : lambda map
         struct DataHasher
         {
-                std::size_t operator()(const mal::Data* key) const noexcept
+                std::size_t operator()(const std::unique_ptr<mal::Data>& key) const noexcept
                 {
                         return std::hash<std::string>{}(key->format());
                 }
@@ -216,7 +217,8 @@ protected:
         struct DataPred
         {
                 // TODO(piyush) Implement this, for real (equality)
-                bool operator()(const mal::Data* lhs, const mal::Data* rhs) const
+                bool operator()(const std::unique_ptr<mal::Data>& lhs,
+                                const std::unique_ptr<mal::Data>& rhs) const
                 {
                         // TODO(piyush) Changed this to check with string values. Ok?
                         return lhs->format() == rhs->format();
@@ -224,7 +226,9 @@ protected:
         };
 
 private:
-        std::unordered_map<mal::Data*, mal::Data*, DataHasher, DataPred> m_hashmap;
+        std::unordered_map<std::unique_ptr<mal::Data>, std::unique_ptr<mal::Data>,
+                           DataHasher, DataPred>
+            m_hashmap;
 };
 
 }  // namespace mal
