@@ -48,14 +48,14 @@ auto tokenize(std::string input) -> std::vector<std::string>
         return out;
 }
 
-auto read_str(std::string input) -> std::unique_ptr<mal::Data>
+auto read_str(std::string input) -> mal::DataPtr
 {
         auto reader = Reader(tokenize(std::move(input)));
 
         return read_form(reader);
 }
 
-auto read_form(Reader& reader) -> std::unique_ptr<mal::Data>
+auto read_form(Reader& reader) -> mal::DataPtr
 {
         const auto token = reader.peek();
 
@@ -78,33 +78,34 @@ auto read_form(Reader& reader) -> std::unique_ptr<mal::Data>
         return read_atom(reader);
 }
 
-auto read_atom(Reader& reader) -> std::unique_ptr<mal::Data>
+auto read_atom(Reader& reader) -> mal::DataPtr
 {
-        const auto token = reader.peek().value();
+        const auto token_val = reader.peek().value();
         reader.consume();
 
-        if (token.front() == '"')
-                return std::make_unique<mal::String>(token);
+        if (token_val.front() == '"')
+                return std::make_unique<mal::String>(token_val);
 
-        int int_value{};
-        if (const auto [p, ec] = std::from_chars(token.data(), token.data() + token.size(),
-                                                 int_value);
+        int int_val{};
+        if (const auto [p, ec] =
+                std::from_chars(token_val.data(), token_val.data() + token_val.size(),
+                                int_val);
             ec == std::errc())
         {
-                return std::make_unique<mal::Integer>(int_value);
+                return std::make_unique<mal::Integer>(int_val);
         }
 
-        return std::make_unique<mal::Symbol>(token);
+        return std::make_unique<mal::Symbol>(token_val);
 }
 
-auto read_list(Reader& reader) -> std::unique_ptr<mal::Data>
+auto read_list(Reader& reader) -> mal::DataPtr
 {
         reader.consume();
 
         auto list = std::make_unique<mal::List>();
         while (auto token = reader.peek())
         {
-                if (*token == ")")
+                if (token.value() == ")")
                 {
                         reader.consume();
                         return list;
@@ -116,14 +117,14 @@ auto read_list(Reader& reader) -> std::unique_ptr<mal::Data>
         return nullptr;
 }
 
-auto read_vector(Reader& reader) -> std::unique_ptr<mal::Data>
+auto read_vector(Reader& reader) -> mal::DataPtr
 {
         reader.consume();
 
         auto vec = std::make_unique<mal::Vector>();
         while (auto token = reader.peek())
         {
-                if (*token == "]")
+                if (token.value() == "]")
                 {
                         reader.consume();
                         return vec;
@@ -135,14 +136,14 @@ auto read_vector(Reader& reader) -> std::unique_ptr<mal::Data>
         return nullptr;
 }
 
-auto read_hashmap(Reader& reader) -> std::unique_ptr<mal::Data>
+auto read_hashmap(Reader& reader) -> mal::DataPtr
 {
         reader.consume();
 
         auto hashmap = std::make_unique<mal::HashMap>();
         while (auto token = reader.peek())
         {
-                if (*token == "}")
+                if (token.value() == "}")
                 {
                         reader.consume();
                         return hashmap;
@@ -151,7 +152,7 @@ auto read_hashmap(Reader& reader) -> std::unique_ptr<mal::Data>
                 auto key = read_form(reader);
 
                 token = reader.peek();
-                if (*token == "}")
+                if (token.value() == "}")
                 {
                         // TODO(piyush) What do?
                         std::cerr << "hashmap without value\n";
@@ -167,7 +168,7 @@ auto read_hashmap(Reader& reader) -> std::unique_ptr<mal::Data>
         return nullptr;
 }
 
-auto read_special_form(Reader& reader, const char type) -> std::unique_ptr<mal::Data>
+auto read_special_form(Reader& reader, const char type) -> mal::DataPtr
 {
         const bool unquoted = (reader.peek()->length() == 1);
         reader.consume();
@@ -197,7 +198,7 @@ auto read_special_form(Reader& reader, const char type) -> std::unique_ptr<mal::
         return nullptr;
 }
 
-auto read_with_meta(Reader& reader) -> std::unique_ptr<mal::Data>
+auto read_with_meta(Reader& reader) -> mal::DataPtr
 {
         reader.consume();
 

@@ -7,8 +7,9 @@
 namespace mal
 {
 class Data;
-}
+using DataPtr = std::unique_ptr<mal::Data>;
+}  // namespace mal
 
-std::string pr_str(std::unique_ptr<mal::Data> value);
+std::string pr_str(mal::DataPtr value);
 
 #endif  // PRINTER_HPP

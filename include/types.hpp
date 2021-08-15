@@ -30,6 +30,8 @@ public:
         [[nodiscard]] virtual std::string format() const = 0;
 };
 
+using DataPtr = std::unique_ptr<mal::Data>;
+
 class Integer : public Data
 {
 public:
@@ -139,7 +141,7 @@ public:
 
         [[nodiscard]] std::string format() const override;
 
-        void push(std::unique_ptr<mal::Data> value)
+        void push(DataPtr value)
         {
                 m_list.push_back(std::move(value));
         }
@@ -150,7 +152,7 @@ public:
         }
 
 private:
-        std::vector<std::unique_ptr<mal::Data>> m_list;
+        std::vector<DataPtr> m_list;
 };
 
 class Vector : public Data
@@ -168,13 +170,13 @@ public:
 
         [[nodiscard]] std::string format() const override;
 
-        void push(std::unique_ptr<mal::Data> value)
+        void push(DataPtr value)
         {
                 m_vector.push_back(std::move(value));
         }
 
 private:
-        std::vector<std::unique_ptr<mal::Data>> m_vector;
+        std::vector<DataPtr> m_vector;
 };
 
 class HashMap : public Data
@@ -192,12 +194,12 @@ public:
 
         [[nodiscard]] std::string format() const override;
 
-        void insert(std::unique_ptr<mal::Data> key, std::unique_ptr<mal::Data> value)
+        void insert(DataPtr key, DataPtr value)
         {
                 m_hashmap.emplace(std::move(key), std::move(value));
         }
 
-        [[nodiscard]] mal::Data* find(std::unique_ptr<mal::Data> key) const
+        [[nodiscard]] mal::Data* find(DataPtr key) const
         {
                 if (auto res = m_hashmap.find(key); res != m_hashmap.end())
                         return res->second.get();
@@ -208,7 +210,7 @@ protected:
         // TODO(piyush) Can use these objects for our symbol : lambda map
         struct DataHasher
         {
-                std::size_t operator()(const std::unique_ptr<mal::Data>& key) const noexcept
+                std::size_t operator()(const DataPtr& key) const noexcept
                 {
                         return std::hash<std::string>{}(key->format());
                 }
@@ -217,8 +219,7 @@ protected:
         struct DataPred
         {
                 // TODO(piyush) Implement this, for real (equality)
-                bool operator()(const std::unique_ptr<mal::Data>& lhs,
-                                const std::unique_ptr<mal::Data>& rhs) const
+                bool operator()(const DataPtr& lhs, const DataPtr& rhs) const
                 {
                         // TODO(piyush) Changed this to check with string values. Ok?
                         return lhs->format() == rhs->format();
@@ -226,9 +227,7 @@ protected:
         };
 
 private:
-        std::unordered_map<std::unique_ptr<mal::Data>, std::unique_ptr<mal::Data>,
-                           DataHasher, DataPred>
-            m_hashmap;
+        std::unordered_map<DataPtr, DataPtr, DataHasher, DataPred> m_hashmap;
 };
 
 }  // namespace mal

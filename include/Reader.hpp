@@ -10,7 +10,8 @@
 namespace mal
 {
 class Data;
-}
+using DataPtr = std::unique_ptr<mal::Data>;
+}  // namespace mal
 
 class Reader
 {
@@ -52,20 +53,20 @@ private:
 
 auto tokenize(std::string input) -> std::vector<std::string>;
 
-auto read_str(std::string input) -> std::unique_ptr<mal::Data>;
+auto read_str(std::string input) -> mal::DataPtr;
 
-auto read_form(Reader& reader) -> std::unique_ptr<mal::Data>;
+auto read_form(Reader& reader) -> mal::DataPtr;
 
-auto read_atom(Reader& reader) -> std::unique_ptr<mal::Data>;
+auto read_atom(Reader& reader) -> mal::DataPtr;
 
-auto read_list(Reader& reader) -> std::unique_ptr<mal::Data>;
+auto read_list(Reader& reader) -> mal::DataPtr;
 
-auto read_vector(Reader& reader) -> std::unique_ptr<mal::Data>;
+auto read_vector(Reader& reader) -> mal::DataPtr;
 
-auto read_hashmap(Reader& reader) -> std::unique_ptr<mal::Data>;
+auto read_hashmap(Reader& reader) -> mal::DataPtr;
 
-auto read_special_form(Reader& reader, char type) -> std::unique_ptr<mal::Data>;
+auto read_special_form(Reader& reader, char type) -> mal::DataPtr;
 
-auto read_with_meta(Reader& reader) -> std::unique_ptr<mal::Data>;
+auto read_with_meta(Reader& reader) -> mal::DataPtr;
 
 #endif  // READER_HPP

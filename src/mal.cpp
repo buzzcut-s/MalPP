@@ -8,20 +8,20 @@
 #include "../include/printer.hpp"
 #include "../include/types.hpp"
 
-std::unique_ptr<mal::Data> READ(std::string input)
+mal::DataPtr READ(std::string input)
 {
         return read_str(std::move(input));
 }
 
 // TODO(piyush) Implement this.
-std::unique_ptr<mal::Data> EVAL(std::unique_ptr<mal::Data> ast, const repl_env& env)
+mal::DataPtr EVAL(mal::DataPtr ast, const repl_env& env)
 {
         auto evaluated = eval_ast(std::move(ast), env);
         return evaluated;
 }
 
 // TODO(piyush) Implement this.
-std::unique_ptr<mal::Data> eval_ast(std::unique_ptr<mal::Data> ast, const repl_env& env)
+mal::DataPtr eval_ast(mal::DataPtr ast, const repl_env& env)
 {
         // TODO(piyush) This is the trickiest part yet
         // TODO(piyush) How to pass arguments to lambda from env?????
@@ -31,7 +31,7 @@ std::unique_ptr<mal::Data> eval_ast(std::unique_ptr<mal::Data> ast, const repl_e
         return ast;
 }
 
-std::string PRINT(std::unique_ptr<mal::Data> input)
+std::string PRINT(mal::DataPtr input)
 {
         return pr_str(std::move(input));
 }

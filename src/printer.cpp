@@ -4,7 +4,7 @@
 
 #include "../include/types.hpp"
 
-std::string pr_str(std::unique_ptr<mal::Data> value)
+std::string pr_str(mal::DataPtr value)
 {
         if (value)
                 return value->format();
