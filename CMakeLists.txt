@@ -20,4 +20,6 @@ add_executable(
   include/printer.hpp
   src/printer.cpp
   include/types.hpp
-  src/types.cpp)
+  src/types.cpp
+  include/Environment.hpp
+  src/Environment.cpp)

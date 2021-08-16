@@ -1,6 +1,7 @@
 #ifndef TYPES_HPP
 #define TYPES_HPP
 
+#include <functional>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -10,12 +11,14 @@
 namespace mal
 {
 
+class Integer;
+class Symbol;
+class List;
+class EvalList;
+class Function;
+
 class Data
 {
-        // Can't implement an evaluate() pure virtual here because we want to recursively call EVAL
-        // Pretty sure we'll have to do shitty stuff to return actual types in eval_ast...
-        // static_cast imminent
-
 public:
         Data() = default;
 
@@ -36,11 +39,18 @@ public:
                 String,
                 List,
                 Vector,
-                HashMap
+                HashMap,
+                EvalList,
+                Function
         };
 
-        [[nodiscard]] virtual Type type() const  = 0;
-        [[nodiscard]] virtual Type value() const = 0;
+        [[nodiscard]] virtual Type type() const = 0;
+
+        Integer*  integer();
+        Symbol*   symbol();
+        List*     list();
+        EvalList* eval_list();
+        Function* function();
 };
 
 using DataPtr = std::unique_ptr<mal::Data>;
@@ -60,27 +70,6 @@ public:
             m_int{int_value}
         {}
 
-        // TODO(piyush) This does look pretty nice, is it?
-        int operator+(const Integer& rhs) const
-        {
-                return m_int + rhs.m_int;
-        }
-
-        int operator-(const Integer& rhs) const
-        {
-                return m_int - rhs.m_int;
-        }
-
-        int operator*(const Integer& rhs) const
-        {
-                return m_int * rhs.m_int;
-        }
-
-        int operator/(const Integer& rhs) const
-        {
-                return m_int / rhs.m_int;
-        }
-
         [[nodiscard]] std::string format() const override
         {
                 return std::to_string(m_int);
@@ -89,6 +78,11 @@ public:
         [[nodiscard]] Type type() const override
         {
                 return Type::Integer;
+        }
+
+        [[nodiscard]] int value() const
+        {
+                return m_int;
         }
 
 private:
@@ -167,7 +161,15 @@ public:
 
         ~List() override = default;
 
+        auto begin() { return m_list.begin(); }
+        auto end() { return m_list.end(); }
+
         [[nodiscard]] std::string format() const override;
+
+        [[nodiscard]] Type type() const override
+        {
+                return Type::List;
+        }
 
         void push(DataPtr value)
         {
@@ -179,13 +181,70 @@ public:
                 return m_list.size();
         }
 
-        [[nodiscard]] Type type() const override
+        [[nodiscard]] bool empty() const
         {
-                return Type::List;
+                return m_list.empty();
+        }
+
+        [[nodiscard]] mal::Data* at(std::size_t idx) const
+        {
+                return m_list.at(idx).get();
+        }
+
+        [[nodiscard]] auto data() const
+        {
+                return m_list.data();
         }
 
 private:
         std::vector<DataPtr> m_list;
+};
+
+class EvalList : public Data
+{
+public:
+        EvalList() = default;
+
+        EvalList(EvalList const& other) = default;
+        EvalList& operator=(EvalList const& other) = default;
+
+        EvalList(EvalList&& other) = default;
+        EvalList& operator=(EvalList&& other) = default;
+
+        ~EvalList() override = default;
+
+        auto begin() { return m_eval_list.begin(); }
+        auto end() { return m_eval_list.end(); }
+
+        [[nodiscard]] std::string format() const override;
+
+        [[nodiscard]] Type type() const override
+        {
+                return Type::EvalList;
+        }
+
+        void push(Data* value)
+        {
+                m_eval_list.push_back(value);
+        }
+
+        [[nodiscard]] size_t size() const
+        {
+                return m_eval_list.size();
+        }
+
+        [[nodiscard]] mal::Data* at(std::size_t idx) const
+        {
+                return m_eval_list.at(idx);
+        }
+
+        [[nodiscard]] auto data() const
+        {
+                return m_eval_list.data();
+        }
+
+private:
+        std::vector<Data*> m_eval_list;
 };
 
 class Vector : public Data
@@ -237,7 +296,7 @@ public:
                 m_hashmap.emplace(std::move(key), std::move(value));
         }
 
-        [[nodiscard]] mal::Data* find(DataPtr key) const
+        [[nodiscard]] auto find(const DataPtr& key) const -> mal::Data*
         {
                 if (auto res = m_hashmap.find(key); res != m_hashmap.cend())
                         return res->second.get();
@@ -249,8 +308,6 @@ public:
                 return Type::HashMap;
         }
 
-protected:
-        // TODO(piyush) Can use these objects for our symbol : lambda map
         struct DataHasher
         {
                 std::size_t operator()(const DataPtr& key) const noexcept
@@ -271,6 +328,46 @@ protected:
 
 private:
         std::unordered_map<DataPtr, DataPtr, DataHasher, DataPred> m_hashmap;
+};
+
+class Function : public Data
+{
+public:
+        using Fn = std::function<mal::Data*(std::size_t argc, mal::Data* const* args)>;
+
+        Function() = default;
+
+        explicit Function(Fn fn) :
+            m_fn{std::move(fn)}
+        {}
+
+        Function(Function const& other) = default;
+        Function& operator=(Function const& other) = default;
+
+        Function(Function&& other) = default;
+        Function& operator=(Function&& other) = default;
+
+        ~Function() override = default;
+
+        [[nodiscard]] std::string format() const override { return ""; }
+
+        [[nodiscard]] Type type() const override
+        {
+                return Type::Function;
+        }
+
+        [[nodiscard]] auto value() const
+        {
+                return m_fn;
+        }
+
+        mal::Data* apply(size_t argc, mal::Data* const* args)
+        {
+                return m_fn(argc, args);
+        }
+
+private:
+        Fn m_fn{};
 };
 
 }  // namespace mal
