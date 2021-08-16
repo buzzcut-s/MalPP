@@ -28,6 +28,19 @@ public:
         virtual ~Data() = default;
 
         [[nodiscard]] virtual std::string format() const = 0;
+
+        enum class Type
+        {
+                Integer,
+                Symbol,
+                String,
+                List,
+                Vector,
+                HashMap
+        };
+
+        [[nodiscard]] virtual Type type() const  = 0;
+        [[nodiscard]] virtual Type value() const = 0;
 };
 
 using DataPtr = std::unique_ptr<mal::Data>;
@@ -73,6 +86,11 @@ public:
                 return std::to_string(m_int);
         }
 
+        [[nodiscard]] Type type() const override
+        {
+                return Type::Integer;
+        }
+
 private:
         int m_int;
 };
@@ -95,6 +113,11 @@ public:
         [[nodiscard]] std::string format() const override
         {
                 return m_symbol;
+        }
+
+        [[nodiscard]] Type type() const override
+        {
+                return Type::Symbol;
         }
 
 private:
@@ -120,6 +143,11 @@ public:
         [[nodiscard]] std::string format() const override
         {
                 return m_string;
+        }
+
+        [[nodiscard]] Type type() const override
+        {
+                return Type::String;
         }
 
 private:
@@ -151,6 +179,11 @@ public:
                 return m_list.size();
         }
 
+        [[nodiscard]] Type type() const override
+        {
+                return Type::List;
+        }
+
 private:
         std::vector<DataPtr> m_list;
 };
@@ -173,6 +206,11 @@ public:
         void push(DataPtr value)
         {
                 m_vector.push_back(std::move(value));
+        }
+
+        [[nodiscard]] Type type() const override
+        {
+                return Type::Vector;
         }
 
 private:
@@ -204,6 +242,11 @@ public:
                 if (auto res = m_hashmap.find(key); res != m_hashmap.cend())
                         return res->second.get();
                 return nullptr;
+        }
+
+        [[nodiscard]] Type type() const override
+        {
+                return Type::HashMap;
         }
 
 protected:
