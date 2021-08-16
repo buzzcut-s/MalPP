@@ -44,6 +44,8 @@ mal::Data* eval_ast(mal::Data* ast, const mal::Environment& env)
                 {
                         return fn.value();
                 }
+                // TODO(piyush) Handle an exception here
+                std::cerr << ast->symbol()->format() << " not found\n";
                 return nullptr;
         }
 
