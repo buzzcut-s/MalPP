@@ -10,55 +10,55 @@ namespace mal
 Integer* Data::integer()
 {
         assert(this->type() == Type::Integer);
-        return dynamic_cast<Integer*>(this);
+        return static_cast<Integer*>(this);
 }
 
 Symbol* Data::symbol()
 {
         assert(this->type() == Type::Symbol);
-        return dynamic_cast<Symbol*>(this);
+        return static_cast<Symbol*>(this);
 }
 
 List* Data::list()
 {
         assert(this->type() == Type::List);
-        return dynamic_cast<List*>(this);
+        return static_cast<List*>(this);
 }
 
 EvalList* Data::eval_list()
 {
         assert(this->type() == Type::EvalList);
-        return dynamic_cast<EvalList*>(this);
+        return static_cast<EvalList*>(this);
 }
 
 Vector* Data::vector()
 {
         assert(this->type() == Type::Vector);
-        return dynamic_cast<Vector*>(this);
+        return static_cast<Vector*>(this);
 }
 
 EvalVector* Data::eval_vector()
 {
         assert(this->type() == Type::EvalVector);
-        return dynamic_cast<EvalVector*>(this);
+        return static_cast<EvalVector*>(this);
 }
 
 HashMap* Data::hashmap()
 {
         assert(this->type() == Type::HashMap);
-        return dynamic_cast<HashMap*>(this);
+        return static_cast<HashMap*>(this);
 }
 
 EvalHashMap* Data::eval_hashmap()
 {
         assert(this->type() == Type::EvalHashMap);
-        return dynamic_cast<EvalHashMap*>(this);
+        return static_cast<EvalHashMap*>(this);
 }
 
 Function* Data::function()
 {
         assert(this->type() == Type::Function);
-        return dynamic_cast<Function*>(this);
+        return static_cast<Function*>(this);
 }
 
 std::string List::format() const
