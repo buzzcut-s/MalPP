@@ -17,6 +17,8 @@ class List;
 class EvalList;
 class Vector;
 class EvalVector;
+class HashMap;
+class EvalHashMap;
 class Function;
 
 class Data
@@ -40,22 +42,25 @@ public:
                 Symbol,
                 String,
                 List,
-                Vector,
-                HashMap,
                 EvalList,
+                Vector,
                 EvalVector,
+                HashMap,
+                EvalHashMap,
                 Function
         };
 
         [[nodiscard]] virtual Type type() const = 0;
 
-        Integer*    integer();
-        Symbol*     symbol();
-        List*       list();
-        EvalList*   eval_list();
-        Vector*     vector();
-        EvalVector* eval_vector();
-        Function*   function();
+        Integer*     integer();
+        Symbol*      symbol();
+        List*        list();
+        EvalList*    eval_list();
+        Vector*      vector();
+        EvalVector*  eval_vector();
+        HashMap*     hashmap();
+        EvalHashMap* eval_hashmap();
+        Function*    function();
 };
 
 using DataPtr = std::unique_ptr<mal::Data>;
@@ -364,6 +369,9 @@ public:
 
         ~HashMap() override = default;
 
+        auto begin() { return m_hashmap.begin(); }
+        auto end() { return m_hashmap.end(); }
+
         [[nodiscard]] std::string format() const override;
 
         void insert(DataPtr key, DataPtr value)
@@ -403,6 +411,63 @@ public:
 
 private:
         std::unordered_map<DataPtr, DataPtr, DataHasher, DataPred> m_hashmap;
+};
+
+class EvalHashMap : public Data
+{
+public:
+        EvalHashMap() = default;
+
+        EvalHashMap(EvalHashMap const& other) = default;
+        EvalHashMap& operator=(EvalHashMap const& other) = default;
+
+        EvalHashMap(EvalHashMap&& other) = default;
+        EvalHashMap& operator=(EvalHashMap&& other) = default;
+
+        ~EvalHashMap() override = default;
+
+        auto begin() { return m_eval_map.begin(); }
+        auto end() { return m_eval_map.end(); }
+
+        [[nodiscard]] std::string format() const override;
+
+        void insert(mal::Data* key, mal::Data* value)
+        {
+                m_eval_map.emplace(key, value);
+        }
+
+        [[nodiscard]] auto find(mal::Data* key) const -> mal::Data*
+        {
+                if (auto res = m_eval_map.find(key); res != m_eval_map.cend())
+                        return res->second;
+                return nullptr;
+        }
+
+        [[nodiscard]] Type type() const override
+        {
+                return Type::EvalHashMap;
+        }
+
+        struct DataHasher
+        {
+                std::size_t operator()(const mal::Data* key) const noexcept
+                {
+                        return std::hash<std::string>{}(key->format());
+                }
+        };
+
+        struct DataPred
+        {
+                // TODO(piyush) Implement this, for real (equality)
+                bool operator()(const mal::Data* lhs, const mal::Data* rhs) const
+                {
+                        // TODO(piyush) Changed this to check with string values. Ok?
+                        return lhs->format() == rhs->format();
+                }
+        };
+
+private:
+        std::unordered_map<mal::Data*, mal::Data*, DataHasher, DataPred> m_eval_map;
 };
 
 class Function : public Data

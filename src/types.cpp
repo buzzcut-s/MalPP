@@ -43,6 +43,18 @@ EvalVector* Data::eval_vector()
         return dynamic_cast<EvalVector*>(this);
 }
 
+HashMap* Data::hashmap()
+{
+        assert(this->type() == Type::HashMap);
+        return dynamic_cast<HashMap*>(this);
+}
+
+EvalHashMap* Data::eval_hashmap()
+{
+        assert(this->type() == Type::EvalHashMap);
+        return dynamic_cast<EvalHashMap*>(this);
+}
+
 Function* Data::function()
 {
         assert(this->type() == Type::Function);
@@ -66,6 +78,23 @@ std::string List::format() const
         return out;
 }
 
+std::string EvalList::format() const
+{
+        std::string out = "(";
+        for (const auto& data : m_eval_list)
+        {
+                out.append(data->format());
+                out.append(" ");
+        }
+
+        if (!m_eval_list.empty())
+                out.back() = ')';
+        else
+                out.append(")");
+
+        return out;
+}
+
 std::string Vector::format() const
 {
         std::string out = "[";
@@ -76,6 +105,23 @@ std::string Vector::format() const
         }
 
         if (!m_vec.empty())
+                out.back() = ']';
+        else
+                out.append("]");
+
+        return out;
+}
+
+std::string EvalVector::format() const
+{
+        std::string out = "[";
+        for (const auto& data : m_eval_vec)
+        {
+                out.append(data->format());
+                out.append(" ");
+        }
+
+        if (!m_eval_vec.empty())
                 out.back() = ']';
         else
                 out.append("]");
@@ -102,36 +148,21 @@ std::string HashMap::format() const
         return out;
 }
 
-std::string EvalList::format() const
+std::string EvalHashMap::format() const
 {
-        std::string out = "(";
-        for (const auto& data : m_eval_list)
+        std::string out = "{";
+        for (const auto& [key, value] : m_eval_map)
         {
-                out.append(data->format());
+                out.append(key->format());
+                out.append(" ");
+                out.append(value->format());
                 out.append(" ");
         }
 
-        if (!m_eval_list.empty())
-                out.back() = ')';
+        if (!m_eval_map.empty())
+                out.back() = '}';
         else
-                out.append(")");
-
-        return out;
-}
-
-std::string EvalVector::format() const
-{
-        std::string out = "[";
-        for (const auto& data : m_eval_vec)
-        {
-                out.append(data->format());
-                out.append(" ");
-        }
-
-        if (!m_eval_vec.empty())
-                out.back() = ']';
-        else
-                out.append("]");
+                out.append("}");
 
         return out;
 }

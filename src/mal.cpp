@@ -67,6 +67,16 @@ mal::Data* eval_ast(mal::Data* ast, const mal::Environment& env)
                 return eval_vec;
         }
 
+        if (ast->type() == mal::Data::Type::HashMap)
+        {
+                auto* eval_map = new mal::EvalHashMap();
+                for (auto& [key, val] : *ast->hashmap())
+                {
+                        eval_map->insert(key.get(), EVAL(val.get(), env));
+                }
+                return eval_map;
+        }
+
         return ast;
 }
 
