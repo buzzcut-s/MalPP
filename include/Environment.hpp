@@ -25,18 +25,14 @@ public:
         Environment(Environment&& other) = default;
         Environment& operator=(Environment&& other) = default;
 
-        ~Environment()
-        {
-                for (auto& op : m_env)
-                        delete op.first;
-        }
+        ~Environment();
 
         auto lookup(mal::Data* key) const -> std::optional<mal::Function*>;
 
 private:
         struct FnHasher
         {
-                std::size_t operator()(const mal::Data* key) const noexcept;
+                std::size_t operator()(const mal::Symbol* key) const noexcept;
         };
 
         struct FnPred

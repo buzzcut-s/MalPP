@@ -5,6 +5,12 @@
 
 #include "../include/types.hpp"
 
+mal::Environment::~Environment()
+{
+        for (auto& [symbol, fn] : m_env)
+                delete symbol;
+}
+
 // TODO(piyush) Implement this, for real (equality)
 bool mal::Environment::FnPred::operator()(const mal::Symbol* lhs, const mal::Symbol* rhs) const
 {
@@ -12,7 +18,7 @@ bool mal::Environment::FnPred::operator()(const mal::Symbol* lhs, const mal::Sym
         return lhs->format() == rhs->format();
 }
 
-std::size_t mal::Environment::FnHasher::operator()(const mal::Data* key) const noexcept
+std::size_t mal::Environment::FnHasher::operator()(const mal::Symbol* key) const noexcept
 {
         return std::hash<std::string>{}(key->format());
 }

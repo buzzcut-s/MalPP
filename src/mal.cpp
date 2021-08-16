@@ -25,8 +25,7 @@ mal::Data* EVAL(mal::Data* ast, const mal::Environment& env)
         if (ast->list()->empty())
                 return ast;
 
-        auto* args = eval_ast(ast, env)->eval_list();
-        if (args->at(0))
+        if (auto* args = eval_ast(ast, env)->eval_list(); args->at(0))
         {
                 auto* fn  = args->at(0)->function();
                 auto* ret = fn->apply(args->size() - 1, args->data() + 1);
@@ -50,7 +49,7 @@ mal::Data* eval_ast(mal::Data* ast, const mal::Environment& env)
 
         if (ast->type() == mal::Data::Type::List)
         {
-                auto eval_list = new mal::EvalList();
+                auto* eval_list = new mal::EvalList();
                 for (auto& val : *ast->list())
                 {
                         eval_list->push(EVAL(val.get(), env));
@@ -68,12 +67,12 @@ std::string PRINT(mal::Data* input)
 
 std::string rep(std::string input)
 {
-        static auto env = mal::Environment{};
         if (auto ast = READ(std::move(input)); ast)
         {
+                static auto env = mal::Environment{};
+
                 auto* result = EVAL(ast.get(), env);
                 auto  ret    = PRINT(result);
-                delete result;
                 return ret;
         }
         return "";
