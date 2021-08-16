@@ -23,7 +23,7 @@ mal::Data* EVAL(mal::Data* ast, const mal::Environment& env)
                 return eval_ast(ast, env);
 
         if (ast->list()->empty())
-                return ast;
+                return new mal::List();
 
         if (auto* args = eval_ast(ast, env)->eval_list(); args->at(0))
         {
@@ -93,6 +93,7 @@ std::string rep(std::string input)
 
                 auto* result = EVAL(ast.get(), env);
                 auto  ret    = PRINT(result);
+                delete result;
                 return ret;
         }
         return "";
