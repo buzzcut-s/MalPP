@@ -31,6 +31,18 @@ EvalList* Data::eval_list()
         return dynamic_cast<EvalList*>(this);
 }
 
+Vector* Data::vector()
+{
+        assert(this->type() == Type::Vector);
+        return dynamic_cast<Vector*>(this);
+}
+
+EvalVector* Data::eval_vector()
+{
+        assert(this->type() == Type::EvalVector);
+        return dynamic_cast<EvalVector*>(this);
+}
+
 Function* Data::function()
 {
         assert(this->type() == Type::Function);
@@ -57,13 +69,13 @@ std::string List::format() const
 std::string Vector::format() const
 {
         std::string out = "[";
-        for (const auto& data : m_vector)
+        for (const auto& data : m_vec)
         {
                 out.append(data->format());
                 out.append(" ");
         }
 
-        if (!m_vector.empty())
+        if (!m_vec.empty())
                 out.back() = ']';
         else
                 out.append("]");
@@ -103,6 +115,23 @@ std::string EvalList::format() const
                 out.back() = ')';
         else
                 out.append(")");
+
+        return out;
+}
+
+std::string EvalVector::format() const
+{
+        std::string out = "[";
+        for (const auto& data : m_eval_vec)
+        {
+                out.append(data->format());
+                out.append(" ");
+        }
+
+        if (!m_eval_vec.empty())
+                out.back() = ']';
+        else
+                out.append("]");
 
         return out;
 }

@@ -57,6 +57,16 @@ mal::Data* eval_ast(mal::Data* ast, const mal::Environment& env)
                 return eval_list;
         }
 
+        if (ast->type() == mal::Data::Type::Vector)
+        {
+                auto* eval_vec = new mal::EvalVector();
+                for (auto& val : *ast->vector())
+                {
+                        eval_vec->push(EVAL(val.get(), env));
+                }
+                return eval_vec;
+        }
+
         return ast;
 }
 

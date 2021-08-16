@@ -15,6 +15,8 @@ class Integer;
 class Symbol;
 class List;
 class EvalList;
+class Vector;
+class EvalVector;
 class Function;
 
 class Data
@@ -41,16 +43,19 @@ public:
                 Vector,
                 HashMap,
                 EvalList,
+                EvalVector,
                 Function
         };
 
         [[nodiscard]] virtual Type type() const = 0;
 
-        Integer*  integer();
-        Symbol*   symbol();
-        List*     list();
-        EvalList* eval_list();
-        Function* function();
+        Integer*    integer();
+        Symbol*     symbol();
+        List*       list();
+        EvalList*   eval_list();
+        Vector*     vector();
+        EvalVector* eval_vector();
+        Function*   function();
 };
 
 using DataPtr = std::unique_ptr<mal::Data>;
@@ -280,11 +285,14 @@ public:
 
         ~Vector() override = default;
 
+        auto begin() { return m_vec.begin(); }
+        auto end() { return m_vec.end(); }
+
         [[nodiscard]] std::string format() const override;
 
         void push(DataPtr value)
         {
-                m_vector.push_back(std::move(value));
+                m_vec.push_back(std::move(value));
         }
 
         [[nodiscard]] Type type() const override
@@ -293,7 +301,54 @@ public:
         }
 
 private:
-        std::vector<DataPtr> m_vector;
+        std::vector<DataPtr> m_vec;
+};
+
+class EvalVector : public Data
+{
+public:
+        EvalVector() = default;
+
+        EvalVector(EvalVector const& other) = default;
+        EvalVector& operator=(EvalVector const& other) = default;
+
+        EvalVector(EvalVector&& other) = default;
+        EvalVector& operator=(EvalVector&& other) = default;
+
+        ~EvalVector() override = default;
+
+        auto begin() { return m_eval_vec.begin(); }
+        auto end() { return m_eval_vec.end(); }
+
+        [[nodiscard]] std::string format() const override;
+
+        [[nodiscard]] Type type() const override
+        {
+                return Type::EvalVector;
+        }
+
+        void push(Data* value)
+        {
+                m_eval_vec.push_back(value);
+        }
+
+        [[nodiscard]] size_t size() const
+        {
+                return m_eval_vec.size();
+        }
+
+        [[nodiscard]] mal::Data* at(std::size_t idx) const
+        {
+                return m_eval_vec.at(idx);
+        }
+
+        [[nodiscard]] auto data() const
+        {
+                return m_eval_vec.data();
+        }
+
+private:
+        std::vector<Data*> m_eval_vec;
 };
 
 class HashMap : public Data
