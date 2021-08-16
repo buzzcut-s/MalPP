@@ -70,6 +70,26 @@ public:
             m_int{int_value}
         {}
 
+        int operator+(const Integer& rhs) const
+        {
+                return m_int + rhs.m_int;
+        }
+
+        int operator-(const Integer& rhs) const
+        {
+                return m_int - rhs.m_int;
+        }
+
+        int operator*(const Integer& rhs) const
+        {
+                return m_int * rhs.m_int;
+        }
+
+        int operator/(const Integer& rhs) const
+        {
+                return m_int / rhs.m_int;
+        }
+
         [[nodiscard]] std::string format() const override
         {
                 return std::to_string(m_int);

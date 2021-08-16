@@ -25,10 +25,16 @@ mal::Data* EVAL(mal::Data* ast, const mal::Environment& env)
         if (ast->list()->empty())
                 return ast;
 
-        auto* eval_list = eval_ast(ast, env)->eval_list();
-        auto* fn        = eval_list->at(0)->function();
+        auto* args = eval_ast(ast, env)->eval_list();
+        if (args->at(0))
+        {
+                auto* fn  = args->at(0)->function();
+                auto* ret = fn->apply(args->size() - 1, args->data() + 1);
+                delete args;
+                return ret;
+        }
 
-        return fn->apply(eval_list->size() - 1, eval_list->data() + 1);
+        return nullptr;
 }
 
 mal::Data* eval_ast(mal::Data* ast, const mal::Environment& env)
@@ -39,7 +45,6 @@ mal::Data* eval_ast(mal::Data* ast, const mal::Environment& env)
                 {
                         return fn.value();
                 }
-                std::cerr << "Symbol not found : " << ast->symbol()->format() << std::endl;
                 return nullptr;
         }
 
@@ -63,10 +68,13 @@ std::string PRINT(mal::Data* input)
 
 std::string rep(std::string input)
 {
-        auto env = mal::Environment{};
-
-        auto  ast    = READ(std::move(input));
-        auto* result = EVAL(ast.get(), env);
-
-        return PRINT(result);
+        static auto env = mal::Environment{};
+        if (auto ast = READ(std::move(input)); ast)
+        {
+                auto* result = EVAL(ast.get(), env);
+                auto  ret    = PRINT(result);
+                delete result;
+                return ret;
+        }
+        return "";
 }

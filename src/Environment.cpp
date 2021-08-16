@@ -5,10 +5,23 @@
 
 #include "../include/types.hpp"
 
+// TODO(piyush) Implement this, for real (equality)
+bool mal::Environment::FnPred::operator()(const mal::Symbol* lhs, const mal::Symbol* rhs) const
+{
+        // TODO(piyush) Changed this to check with string values. Ok?
+        return lhs->format() == rhs->format();
+}
+
+std::size_t mal::Environment::FnHasher::operator()(const mal::Data* key) const noexcept
+{
+        return std::hash<std::string>{}(key->format());
+}
+
 mal::Environment::Environment()
 {
-        static const std::function<mal::Data*(const size_t argc, mal::Data* const* args)>
-            add_impl = [](size_t argc, mal::Data* const* args) -> mal::Data* {
+        using Fn = std::function<mal::Data*(std::size_t argc, mal::Data* const* args)>;
+
+        Fn add_impl = [](size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc == 2);
                 const auto& lhs = args[0];
                 const auto& rhs = args[1];
@@ -16,12 +29,12 @@ mal::Environment::Environment()
                 assert(lhs->type() == mal::Data::Type::Integer);
                 assert(lhs->type() == mal::Data::Type::Integer);
 
-                auto res = lhs->integer()->value() + rhs->integer()->value();
+                auto res = *lhs->integer() + *rhs->integer();
+                // TODO(piyush) Memory leak :D
                 return new mal::Integer(res);
         };
 
-        static const std::function<mal::Data*(const size_t argc, mal::Data* const* args)>
-            subtract_impl = [](size_t argc, mal::Data* const* args) -> mal::Data* {
+        Fn subtract_impl = [](size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc == 2);
                 const auto& lhs = args[0];
                 const auto& rhs = args[1];
@@ -29,12 +42,12 @@ mal::Environment::Environment()
                 assert(lhs->type() == mal::Data::Type::Integer);
                 assert(lhs->type() == mal::Data::Type::Integer);
 
-                auto res = lhs->integer()->value() - rhs->integer()->value();
+                auto res = *lhs->integer() - *rhs->integer();
+                // TODO(piyush) Memory leak :D
                 return new mal::Integer(res);
         };
 
-        static const std::function<mal::Data*(const size_t argc, mal::Data* const* args)>
-            multiply_impl = [](size_t argc, mal::Data* const* args) -> mal::Data* {
+        Fn multiply_impl = [](size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc == 2);
                 const auto& lhs = args[0];
                 const auto& rhs = args[1];
@@ -42,12 +55,12 @@ mal::Environment::Environment()
                 assert(lhs->type() == mal::Data::Type::Integer);
                 assert(lhs->type() == mal::Data::Type::Integer);
 
-                auto res = lhs->integer()->value() * rhs->integer()->value();
+                auto res = *lhs->integer() * *rhs->integer();
+                // TODO(piyush) Memory leak :D
                 return new mal::Integer(res);
         };
 
-        static const std::function<mal::Data*(const size_t argc, mal::Data* const* args)>
-            divide_impl = [](size_t argc, mal::Data* const* args) -> mal::Data* {
+        Fn divide_impl = [](size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc == 2);
                 const auto& lhs = args[0];
                 const auto& rhs = args[1];
@@ -55,7 +68,8 @@ mal::Environment::Environment()
                 assert(lhs->type() == mal::Data::Type::Integer);
                 assert(lhs->type() == mal::Data::Type::Integer);
 
-                auto res = lhs->integer()->value() / rhs->integer()->value();
+                auto res = *lhs->integer() / *rhs->integer();
+                // TODO(piyush) Memory leak :D
                 return new mal::Integer(res);
         };
 
