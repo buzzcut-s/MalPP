@@ -38,14 +38,14 @@ public:
 
         enum class Type
         {
-                Integer,
                 Symbol,
-                String,
                 List,
-                EvalList,
                 Vector,
-                EvalVector,
                 HashMap,
+                Integer,
+                String,
+                EvalList,
+                EvalVector,
                 EvalHashMap,
                 Function
         };
@@ -67,13 +67,13 @@ public:
 
         [[nodiscard]] virtual Type type() const = 0;
 
-        Integer*     integer();
         Symbol*      symbol();
         List*        list();
-        EvalList*    eval_list();
         Vector*      vector();
-        EvalVector*  eval_vector();
         HashMap*     hashmap();
+        Integer*     integer();
+        EvalList*    eval_list();
+        EvalVector*  eval_vector();
         EvalHashMap* eval_hashmap();
         Function*    function();
 

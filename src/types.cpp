@@ -113,12 +113,6 @@ std::string EvalHashMap::format() const
         return out;
 }
 
-Integer* Data::integer()
-{
-        assert(this->type() == Type::Integer);
-        return static_cast<Integer*>(this);
-}
-
 Symbol* Data::symbol()
 {
         assert(this->type() == Type::Symbol);
@@ -131,28 +125,34 @@ List* Data::list()
         return static_cast<List*>(this);
 }
 
-EvalList* Data::eval_list()
-{
-        assert(this->type() == Type::EvalList);
-        return static_cast<EvalList*>(this);
-}
-
 Vector* Data::vector()
 {
         assert(this->type() == Type::Vector);
         return static_cast<Vector*>(this);
 }
 
-EvalVector* Data::eval_vector()
-{
-        assert(this->type() == Type::EvalVector);
-        return static_cast<EvalVector*>(this);
-}
-
 HashMap* Data::hashmap()
 {
         assert(this->type() == Type::HashMap);
         return static_cast<HashMap*>(this);
+}
+
+Integer* Data::integer()
+{
+        assert(this->type() == Type::Integer);
+        return static_cast<Integer*>(this);
+}
+
+EvalList* Data::eval_list()
+{
+        assert(this->type() == Type::EvalList);
+        return static_cast<EvalList*>(this);
+}
+
+EvalVector* Data::eval_vector()
+{
+        assert(this->type() == Type::EvalVector);
+        return static_cast<EvalVector*>(this);
 }
 
 EvalHashMap* Data::eval_hashmap()

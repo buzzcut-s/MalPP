@@ -45,6 +45,10 @@ CheckOptions:
     value:           'true'
   - key:             readability-simplify-boolean-expr.ChainedConditionalReturn
     value:           'true'
+
+  - key:             readability-identifier-length.IgnoredVariableNames
+    value:           'fn'
+
     
   - { key: readability-identifier-naming.ClassCase,              value: CamelCase  }
   - { key: readability-identifier-naming.PrivateMemberPrefix,    value: m_         }

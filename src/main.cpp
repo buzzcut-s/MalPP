@@ -10,9 +10,9 @@ int main()
         std::string input;
         while (readline::read(input))
         {
-                static auto env = mal::Environment{};
+                static auto repl_env = mal::Environment{};
 
-                auto out = rep(input, env);
+                auto out = rep(input, repl_env);
                 std::cout << out << std::endl;
         }
 
