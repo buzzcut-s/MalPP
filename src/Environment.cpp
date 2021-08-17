@@ -5,75 +5,78 @@
 
 #include "../include/types.hpp"
 
-mal::Environment::~Environment()
+namespace mal
+{
+
+Environment::~Environment()
 {
         for (auto& [symbol, fn] : m_env)
                 delete symbol;
 }
 
 // TODO(piyush) Implement this, for real (equality)
-bool mal::Environment::FnPred::operator()(const mal::Symbol* lhs, const mal::Symbol* rhs) const
+bool Environment::FnPred::operator()(const mal::Symbol* lhs, const mal::Symbol* rhs) const
 {
         // TODO(piyush) Changed this to check with string values. Ok?
         return lhs->format() == rhs->format();
 }
 
-std::size_t mal::Environment::FnHasher::operator()(const mal::Symbol* key) const noexcept
+std::size_t Environment::FnHasher::operator()(const mal::Symbol* key) const noexcept
 {
         return std::hash<std::string>{}(key->format());
 }
 
-mal::Environment::Environment()
+Environment::Environment()
 {
-        using Fn = std::function<mal::Data*(std::size_t argc, mal::Data* const* args)>;
+        using Fn = std::function<mal::Data*(const std::size_t argc, mal::Data* const* args)>;
         using mal::Data::AllocType::Nude;
 
-        Fn add_impl = [](size_t argc, mal::Data* const* args) -> mal::Data* {
+        const Fn add_impl = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc == 2);
                 const auto& lhs = args[0];
                 const auto& rhs = args[1];
 
                 assert(lhs->type() == mal::Data::Type::Integer);
-                assert(lhs->type() == mal::Data::Type::Integer);
+                assert(rhs->type() == mal::Data::Type::Integer);
 
                 auto res = *lhs->integer() + *rhs->integer();
                 // TODO(piyush) Memory leak :D
                 return new mal::Integer(res, Nude);
         };
 
-        Fn subtract_impl = [](size_t argc, mal::Data* const* args) -> mal::Data* {
+        const Fn subtract_impl = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc == 2);
                 const auto& lhs = args[0];
                 const auto& rhs = args[1];
 
                 assert(lhs->type() == mal::Data::Type::Integer);
-                assert(lhs->type() == mal::Data::Type::Integer);
+                assert(rhs->type() == mal::Data::Type::Integer);
 
                 auto res = *lhs->integer() - *rhs->integer();
                 // TODO(piyush) Memory leak :D
                 return new mal::Integer(res, Nude);
         };
 
-        Fn multiply_impl = [](size_t argc, mal::Data* const* args) -> mal::Data* {
+        const Fn multiply_impl = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc == 2);
                 const auto& lhs = args[0];
                 const auto& rhs = args[1];
 
                 assert(lhs->type() == mal::Data::Type::Integer);
-                assert(lhs->type() == mal::Data::Type::Integer);
+                assert(rhs->type() == mal::Data::Type::Integer);
 
                 auto res = *lhs->integer() * *rhs->integer();
                 // TODO(piyush) Memory leak :D
                 return new mal::Integer(res, Nude);
         };
 
-        Fn divide_impl = [](size_t argc, mal::Data* const* args) -> mal::Data* {
+        const Fn divide_impl = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc == 2);
                 const auto& lhs = args[0];
                 const auto& rhs = args[1];
 
                 assert(lhs->type() == mal::Data::Type::Integer);
-                assert(lhs->type() == mal::Data::Type::Integer);
+                assert(rhs->type() == mal::Data::Type::Integer);
 
                 auto res = *lhs->integer() / *rhs->integer();
                 // TODO(piyush) Memory leak :D
@@ -90,9 +93,11 @@ mal::Environment::Environment()
                       std::make_unique<mal::Function>(divide_impl));
 };
 
-auto mal::Environment::lookup(mal::Data* key) const -> std::optional<mal::Function*>
+auto Environment::lookup(mal::Data* key) const -> std::optional<mal::Function*>
 {
         if (auto res = m_env.find(key->symbol()); res != m_env.cend())
                 return res->second->function();
         return std::nullopt;
 }
+
+}  // namespace mal

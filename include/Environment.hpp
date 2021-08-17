@@ -39,7 +39,7 @@ private:
                 bool operator()(const mal::Symbol* lhs, const mal::Symbol* rhs) const;
         };
 
-        using EnvMap = std::unordered_map<mal::Symbol*, mal::DataPtr,
+        using EnvMap = std::unordered_map<const mal::Symbol*, const mal::DataPtr,
                                           mal::Environment::FnHasher, mal::Environment::FnPred>;
 
         EnvMap m_env{};

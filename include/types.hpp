@@ -509,7 +509,7 @@ private:
 class Function : public Data
 {
 public:
-        using Fn = std::function<mal::Data*(std::size_t argc, mal::Data* const* args)>;
+        using Fn = std::function<mal::Data*(const std::size_t argc, mal::Data* const* args)>;
 
         Function() = delete;
 
@@ -518,10 +518,10 @@ public:
         {}
 
         Function(Function const& other) = default;
-        Function& operator=(Function const& other) = default;
+        Function& operator=(Function const& other) = delete;
 
         Function(Function&& other) = default;
-        Function& operator=(Function&& other) = default;
+        Function& operator=(Function&& other) = delete;
 
         ~Function() override = default;
 
@@ -537,13 +537,13 @@ public:
                 return m_fn;
         }
 
-        mal::Data* apply(size_t argc, mal::Data* const* args)
+        auto apply(const size_t argc, mal::Data* const* args) const -> mal::Data*
         {
                 return m_fn(argc, args);
         }
 
 private:
-        Fn m_fn{};
+        const Fn m_fn{};
 };
 
 }  // namespace mal
