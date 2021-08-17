@@ -30,8 +30,8 @@ mal::Data* EVAL(mal::Data* ast, const mal::Environment& repl_env)
         auto* args = eval_ast(ast, repl_env)->eval_list();
         if (args->at(0) && args->at(0)->type() == mal::Data::Type::Function)
         {
-                auto* fn  = args->at(0)->function();
-                auto* ret = fn->apply(args->size() - 1, args->data() + 1);
+                auto* mal_fn = args->at(0)->function();
+                auto* ret    = mal_fn->apply(args->size() - 1, args->data() + 1);
                 delete args;
                 return ret;
         }

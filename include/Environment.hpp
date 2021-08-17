@@ -16,7 +16,11 @@ namespace mal
 class Environment
 {
 public:
-        Environment();
+        Environment() = delete;
+
+        explicit Environment(Environment* outer) :
+            m_outer(outer)
+        {}
 
         Environment(Environment const& other) = default;
         Environment& operator=(Environment const& other) = default;
@@ -26,12 +30,16 @@ public:
 
         ~Environment();
 
-        auto lookup(mal::Data* key) const -> std::optional<mal::Function*>;
+        void init();
+
+        void set(const mal::Symbol* symbol_key, mal::DataPtr mal_fn);
+
+        auto lookup(mal::Data* symbol_key) const -> std::optional<mal::Function*>;
 
 private:
         struct FnHasher
         {
-                std::size_t operator()(const mal::Symbol* key) const noexcept;
+                std::size_t operator()(const mal::Symbol* symbol_key) const noexcept;
         };
 
         struct FnPred
@@ -42,7 +50,8 @@ private:
         using EnvMap = std::unordered_map<const mal::Symbol*, const mal::DataPtr,
                                           mal::Environment::FnHasher, mal::Environment::FnPred>;
 
-        EnvMap m_env{};
+        Environment* m_outer;
+        EnvMap       m_env{};
 };
 
 }  // namespace mal
