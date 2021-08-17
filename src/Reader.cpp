@@ -15,7 +15,8 @@ using mal::Data::AllocType::Unique;
 
 auto tokenize(std::string input) -> std::vector<std::string>
 {
-        static const auto TOKEN_REGEX = std::regex(R"((~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]+))");
+        static const auto TOKEN_REGEX =
+            std::regex(R"((~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]+))");
 
         std::string str{std::move(input)};
         std::smatch result{};
@@ -83,7 +84,6 @@ auto read_form(Reader& reader) -> mal::DataPtr
 
 auto read_atom(Reader& reader) -> mal::DataPtr
 {
-
         const auto token_val = reader.peek().value();
         reader.consume();
 

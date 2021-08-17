@@ -5,6 +5,7 @@
 #include <optional>
 #include <string>
 #include <unordered_map>
+#include <utility>
 
 // TODO(piyush) Can we forward declare relevant types here?
 // Doesn't compile since I shifted env to main without this
@@ -28,18 +29,22 @@ public:
         Environment(Environment&& other) = default;
         Environment& operator=(Environment&& other) = default;
 
+        auto begin() { return m_env.begin(); }
+        auto end() { return m_env.end(); }
+
         ~Environment();
 
         void init();
+        void set_inner(Environment* inner) { m_inner = inner; }
+        void set(const mal::Symbol* sym_key, mal::Data* mal_data);
 
-        void set(const mal::Symbol* symbol_key, mal::DataPtr mal_fn);
-
-        auto lookup(mal::Data* symbol_key) const -> std::optional<mal::Function*>;
+        auto find_env(const mal::Symbol* sym_key) const -> const Environment*;
+        auto lookup(const mal::Symbol* sym_key) const -> mal::Data*;
 
 private:
         struct FnHasher
         {
-                std::size_t operator()(const mal::Symbol* symbol_key) const noexcept;
+                std::size_t operator()(const mal::Symbol* sym_key) const noexcept;
         };
 
         struct FnPred
@@ -47,10 +52,11 @@ private:
                 bool operator()(const mal::Symbol* lhs, const mal::Symbol* rhs) const;
         };
 
-        using EnvMap = std::unordered_map<const mal::Symbol*, const mal::DataPtr,
+        using EnvMap = std::unordered_map<const mal::Symbol*, mal::Data*,
                                           mal::Environment::FnHasher, mal::Environment::FnPred>;
 
         Environment* m_outer;
+        Environment* m_inner{};
         EnvMap       m_env{};
 };
 

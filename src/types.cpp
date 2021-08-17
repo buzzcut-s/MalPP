@@ -7,6 +7,54 @@
 namespace mal
 {
 
+// TODO(piush) Evaluate destructors
+// Fixes Functiion::apply() memory leak
+
+EvalList::~EvalList()
+{
+        for (auto* ptr : m_eval_list)
+        {
+                if (ptr && ptr->alloc_type() == mal::Data::AllocType::Nude)
+                        delete ptr;
+        }
+}
+
+CloneList::~CloneList()
+{
+        for (auto* ptr : m_clone_list)
+        {
+                if (ptr && ptr->alloc_type() == mal::Data::AllocType::Clone)
+                        delete ptr;
+        }
+}
+
+EvalVector::~EvalVector()
+{
+        for (auto* ptr : m_eval_vec)
+        {
+                if (ptr && ptr->alloc_type() == mal::Data::AllocType::Nude)
+                        delete ptr;
+        }
+}
+
+CloneVector::~CloneVector()
+{
+        for (auto* ptr : m_clone_vec)
+        {
+                if (ptr && ptr->alloc_type() == mal::Data::AllocType::Clone)
+                        delete ptr;
+        }
+}
+
+EvalHashMap::~EvalHashMap()
+{
+        for (auto& [key, val] : m_eval_map)
+        {
+                if (val && val->alloc_type() == mal::Data::AllocType::Nude)
+                        delete val;
+        }
+}
+
 std::string List::format() const
 {
         std::string out = "(";
@@ -41,6 +89,23 @@ std::string EvalList::format() const
         return out;
 }
 
+std::string CloneList::format() const
+{
+        std::string out = "(";
+        for (const auto& data : m_clone_list)
+        {
+                out.append(data->format());
+                out.append(" ");
+        }
+
+        if (!m_clone_list.empty())
+                out.back() = ')';
+        else
+                out.append(")");
+
+        return out;
+}
+
 std::string Vector::format() const
 {
         std::string out = "[";
@@ -68,6 +133,23 @@ std::string EvalVector::format() const
         }
 
         if (!m_eval_vec.empty())
+                out.back() = ']';
+        else
+                out.append("]");
+
+        return out;
+}
+
+std::string CloneVector::format() const
+{
+        std::string out = "[";
+        for (const auto& data : m_clone_vec)
+        {
+                out.append(data->format());
+                out.append(" ");
+        }
+
+        if (!m_clone_vec.empty())
                 out.back() = ']';
         else
                 out.append("]");

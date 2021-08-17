@@ -53,17 +53,15 @@ public:
         enum class AllocType
         {
                 Unique,
-                Nude
+                Nude,
+                Clone
         };
 
         explicit Data(AllocType alloc) :
             m_alloc(alloc)
         {}
 
-        [[nodiscard]] AllocType alloc_type() const
-        {
-                return m_alloc;
-        }
+        [[nodiscard]] AllocType alloc_type() const { return m_alloc; }
 
         [[nodiscard]] virtual Type type() const = 0;
 
@@ -100,35 +98,19 @@ public:
 
         ~Integer() override = default;
 
-        [[nodiscard]] std::string format() const override
-        {
-                return std::to_string(m_int);
-        }
+        [[nodiscard]] std::string format() const override { return std::to_string(m_int); }
 
-        [[nodiscard]] Type type() const override
-        {
-                return Type::Integer;
-        }
+        [[nodiscard]] Type type() const override { return Type::Integer; }
 
-        int operator+(const Integer& rhs) const
-        {
-                return m_int + rhs.m_int;
-        }
+        [[nodiscard]] int value() const { return m_int; }
 
-        int operator-(const Integer& rhs) const
-        {
-                return m_int - rhs.m_int;
-        }
+        int operator+(const Integer& rhs) const { return m_int + rhs.m_int; }
 
-        int operator*(const Integer& rhs) const
-        {
-                return m_int * rhs.m_int;
-        }
+        int operator-(const Integer& rhs) const { return m_int - rhs.m_int; }
 
-        int operator/(const Integer& rhs) const
-        {
-                return m_int / rhs.m_int;
-        }
+        int operator*(const Integer& rhs) const { return m_int * rhs.m_int; }
+
+        int operator/(const Integer& rhs) const { return m_int / rhs.m_int; }
 
 private:
         int m_int;
@@ -151,15 +133,14 @@ public:
 
         ~Symbol() override = default;
 
-        [[nodiscard]] std::string format() const override
-        {
-                return m_symbol;
-        }
+        [[nodiscard]] std::string format() const override { return m_symbol; }
 
-        [[nodiscard]] Type type() const override
-        {
-                return Type::Symbol;
-        }
+        [[nodiscard]] Type type() const override { return Type::Symbol; }
+
+        [[nodiscard]] std::string value() const { return m_symbol; }
+
+        [[nodiscard]] bool is_def() const { return m_symbol == "def!"; }
+        [[nodiscard]] bool is_let() const { return m_symbol == "let*"; }
 
 private:
         std::string m_symbol;
@@ -182,15 +163,9 @@ public:
 
         ~String() override = default;
 
-        [[nodiscard]] std::string format() const override
-        {
-                return m_string;
-        }
+        [[nodiscard]] std::string format() const override { return m_string; }
 
-        [[nodiscard]] Type type() const override
-        {
-                return Type::String;
-        }
+        [[nodiscard]] Type type() const override { return Type::String; }
 
 private:
         std::string m_string;
@@ -215,36 +190,61 @@ public:
 
         [[nodiscard]] std::string format() const override;
 
-        [[nodiscard]] Type type() const override
-        {
-                return Type::List;
-        }
+        [[nodiscard]] Type type() const override { return Type::List; }
 
         auto begin() { return m_list.begin(); }
         auto end() { return m_list.end(); }
 
-        void push(DataPtr value)
-        {
-                m_list.push_back(std::move(value));
-        }
+        auto front() { return m_list.front().get(); }
 
-        [[nodiscard]] size_t size() const
-        {
-                return m_list.size();
-        }
+        void push(DataPtr value) { m_list.push_back(std::move(value)); }
 
-        [[nodiscard]] bool empty() const
-        {
-                return m_list.empty();
-        }
+        [[nodiscard]] size_t size() const { return m_list.size(); }
 
-        [[nodiscard]] mal::Data* at(std::size_t idx) const
-        {
-                return m_list.at(idx).get();
-        }
+        [[nodiscard]] bool empty() const { return m_list.empty(); }
+
+        [[nodiscard]] mal::Data* at(std::size_t idx) const { return m_list.at(idx).get(); }
 
 private:
         std::vector<DataPtr> m_list;
+};
+
+class CloneList : public Data
+{
+public:
+        CloneList() = delete;
+
+        explicit CloneList(AllocType alloc = AllocType::Clone) :
+            Data(alloc)
+        {}
+
+        CloneList(CloneList const& other) = default;
+        CloneList& operator=(CloneList const& other) = default;
+
+        CloneList(CloneList&& other) = default;
+        CloneList& operator=(CloneList&& other) = default;
+
+        ~CloneList() override;
+
+        [[nodiscard]] std::string format() const override;
+
+        [[nodiscard]] Type type() const override { return Type::EvalList; }
+
+        auto begin() { return m_clone_list.begin(); }
+        auto end() { return m_clone_list.end(); }
+
+        auto front() { return m_clone_list.front(); }
+
+        void push(Data* value) { m_clone_list.push_back(value); }
+
+        [[nodiscard]] size_t size() const { return m_clone_list.size(); }
+
+        [[nodiscard]] mal::Data* at(std::size_t idx) const { return m_clone_list.at(idx); }
+
+        [[nodiscard]] auto data() const { return m_clone_list.data(); }
+
+private:
+        std::vector<Data*> m_clone_list;
 };
 
 class EvalList : public Data
@@ -262,44 +262,24 @@ public:
         EvalList(EvalList&& other) = default;
         EvalList& operator=(EvalList&& other) = default;
 
-        ~EvalList() override
-        {
-                for (auto* p : m_eval_list)
-                        // TODO(piush) Evaluate this again
-                        // Fixes Functiion::apply() memory leak
-                        if (p && p->alloc_type() == mal::Data::AllocType::Nude)
-                                delete p;
-        }
+        ~EvalList() override;
 
         [[nodiscard]] std::string format() const override;
 
-        [[nodiscard]] Type type() const override
-        {
-                return Type::EvalList;
-        }
+        [[nodiscard]] Type type() const override { return Type::EvalList; }
 
         auto begin() { return m_eval_list.begin(); }
         auto end() { return m_eval_list.end(); }
 
-        void push(Data* value)
-        {
-                m_eval_list.push_back(value);
-        }
+        auto front() { return m_eval_list.front(); }
 
-        [[nodiscard]] size_t size() const
-        {
-                return m_eval_list.size();
-        }
+        void push(Data* value) { m_eval_list.push_back(value); }
 
-        [[nodiscard]] mal::Data* at(std::size_t idx) const
-        {
-                return m_eval_list.at(idx);
-        }
+        [[nodiscard]] size_t size() const { return m_eval_list.size(); }
 
-        [[nodiscard]] auto data() const
-        {
-                return m_eval_list.data();
-        }
+        [[nodiscard]] mal::Data* at(std::size_t idx) const { return m_eval_list.at(idx); }
+
+        [[nodiscard]] auto data() const { return m_eval_list.data(); }
 
 private:
         std::vector<Data*> m_eval_list;
@@ -324,18 +304,18 @@ public:
 
         [[nodiscard]] std::string format() const override;
 
-        [[nodiscard]] Type type() const override
-        {
-                return Type::Vector;
-        }
+        [[nodiscard]] Type type() const override { return Type::Vector; }
 
         auto begin() { return m_vec.begin(); }
         auto end() { return m_vec.end(); }
 
-        void push(DataPtr value)
-        {
-                m_vec.push_back(std::move(value));
-        }
+        void push(DataPtr value) { m_vec.push_back(std::move(value)); }
+
+        [[nodiscard]] size_t size() const { return m_vec.size(); }
+
+        [[nodiscard]] bool empty() const { return m_vec.empty(); }
+
+        [[nodiscard]] mal::Data* at(std::size_t idx) const { return m_vec.at(idx).get(); }
 
 private:
         std::vector<DataPtr> m_vec;
@@ -356,32 +336,49 @@ public:
         EvalVector(EvalVector&& other) = default;
         EvalVector& operator=(EvalVector&& other) = default;
 
-        ~EvalVector() override
-        {
-                for (auto* p : m_eval_vec)
-                        // TODO(piush) Evaluate this again
-                        // Fixes Functiion::apply() memory leak
-                        if (p && p->alloc_type() == mal::Data::AllocType::Nude)
-                                delete p;
-        }
+        ~EvalVector() override;
 
         [[nodiscard]] std::string format() const override;
 
-        [[nodiscard]] Type type() const override
-        {
-                return Type::EvalVector;
-        }
+        [[nodiscard]] Type type() const override { return Type::EvalVector; }
 
         auto begin() { return m_eval_vec.begin(); }
         auto end() { return m_eval_vec.end(); }
 
-        void push(Data* value)
-        {
-                m_eval_vec.push_back(value);
-        }
+        void push(Data* value) { m_eval_vec.push_back(value); }
 
 private:
         std::vector<Data*> m_eval_vec;
+};
+
+class CloneVector : public Data
+{
+public:
+        CloneVector() = delete;
+
+        explicit CloneVector(AllocType alloc = AllocType::Nude) :
+            Data(alloc)
+        {}
+
+        CloneVector(CloneVector const& other) = default;
+        CloneVector& operator=(CloneVector const& other) = default;
+
+        CloneVector(CloneVector&& other) = default;
+        CloneVector& operator=(CloneVector&& other) = default;
+
+        ~CloneVector() override;
+
+        [[nodiscard]] std::string format() const override;
+
+        [[nodiscard]] Type type() const override { return Type::EvalVector; }
+
+        auto begin() { return m_clone_vec.begin(); }
+        auto end() { return m_clone_vec.end(); }
+
+        void push(Data* value) { m_clone_vec.push_back(value); }
+
+private:
+        std::vector<Data*> m_clone_vec;
 };
 
 class HashMap : public Data
@@ -403,10 +400,7 @@ public:
 
         [[nodiscard]] std::string format() const override;
 
-        [[nodiscard]] Type type() const override
-        {
-                return Type::HashMap;
-        }
+        [[nodiscard]] Type type() const override { return Type::HashMap; }
 
         auto begin() { return m_hashmap.begin(); }
         auto end() { return m_hashmap.end(); }
@@ -460,29 +454,16 @@ public:
         EvalHashMap(EvalHashMap&& other) = default;
         EvalHashMap& operator=(EvalHashMap&& other) = default;
 
-        ~EvalHashMap() override
-        {
-                for (auto& [key, val] : m_eval_map)
-                        // TODO(piush) Evaluate this again
-                        // Fixes Functiion::apply() memory leak
-                        if (val && val->alloc_type() == mal::Data::AllocType::Nude)
-                                delete val;
-        }
+        ~EvalHashMap() override;
 
         [[nodiscard]] std::string format() const override;
 
-        [[nodiscard]] Type type() const override
-        {
-                return Type::EvalHashMap;
-        }
+        [[nodiscard]] Type type() const override { return Type::EvalHashMap; }
 
         auto begin() { return m_eval_map.begin(); }
         auto end() { return m_eval_map.end(); }
 
-        void insert(mal::Data* key, mal::Data* value)
-        {
-                m_eval_map.emplace(key, value);
-        }
+        void insert(mal::Data* key, mal::Data* value) { m_eval_map.emplace(key, value); }
 
 private:
         struct EvalDataHasher
@@ -527,15 +508,9 @@ public:
 
         [[nodiscard]] std::string format() const override { return "formatting function"; }
 
-        [[nodiscard]] Type type() const override
-        {
-                return Type::Function;
-        }
+        [[nodiscard]] Type type() const override { return Type::Function; }
 
-        [[nodiscard]] auto value() const
-        {
-                return m_fn;
-        }
+        [[nodiscard]] auto value() const { return m_fn; }
 
         auto apply(const size_t argc, mal::Data* const* args) const -> mal::Data*
         {

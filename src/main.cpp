@@ -10,12 +10,13 @@ constexpr auto OUTER = nullptr;
 int main()
 {
         std::string input;
+
+        auto repl_env = std::make_unique<mal::Environment>(OUTER);
+        repl_env->init();
+
         while (readline::read(input))
         {
-                static auto repl_env = mal::Environment{OUTER};
-                repl_env.init();
-
-                auto out = rep(input, repl_env);
+                auto out = rep(input, *repl_env);
                 std::cout << out << std::endl;
         }
 

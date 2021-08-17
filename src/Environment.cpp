@@ -1,6 +1,7 @@
 #include "../include/Environment.hpp"
 
 #include <cassert>
+#include <iostream>
 #include <optional>
 
 #include "../include/types.hpp"
@@ -11,7 +12,11 @@ namespace mal
 Environment::~Environment()
 {
         for (auto& [symbol_key, fn] : m_env)
+        {
+                delete fn;
                 delete symbol_key;
+        }
+        delete m_inner;
 }
 
 void Environment::init()
@@ -67,38 +72,45 @@ void Environment::init()
                 return new mal::Integer(res, Nude);
         };
 
-        this->set(new mal::Symbol("+", Nude),
-                  std::make_unique<mal::Function>(add_impl));
-        this->set(new mal::Symbol("-", Nude),
-                  std::make_unique<mal::Function>(subtract_impl));
-        this->set(new mal::Symbol("*", Nude),
-                  std::make_unique<mal::Function>(multiply_impl));
-        this->set(new mal::Symbol("/", Nude),
-                  std::make_unique<mal::Function>(divide_impl));
+        set(new mal::Symbol("+", Nude), new mal::Function(add_impl));
+        set(new mal::Symbol("-", Nude), new mal::Function(subtract_impl));
+        set(new mal::Symbol("*", Nude), new mal::Function(multiply_impl));
+        set(new mal::Symbol("/", Nude), new mal::Function(divide_impl));
 }
 
-void Environment::set(const mal::Symbol* symbol_key, mal::DataPtr mal_fn)
+void Environment::set(const mal::Symbol* sym_key, mal::Data* mal_data)
 {
-        m_env.emplace(symbol_key, std::move(mal_fn));
+        m_env[sym_key] = mal_data;
+}
+
+const Environment* Environment::find_env(const mal::Symbol* sym_key) const
+{
+        if (auto res = m_env.find(sym_key); res != m_env.cend())
+                return this;
+        if (m_outer)
+                return m_outer->find_env(sym_key);
+        return nullptr;
+}
+
+auto Environment::lookup(const mal::Symbol* sym_key) const -> mal::Data*
+{
+        if (const auto* env = find_env(sym_key); env)
+                return env->m_env.at(sym_key);
+
+        // TODO(piyush) Handle an exception here
+        std::cerr << "'" << sym_key->value() << "' not found";
+        return nullptr;
 }
 
 // TODO(piyush) Implement this, for real (equality)
 bool Environment::FnPred::operator()(const mal::Symbol* lhs, const mal::Symbol* rhs) const
 {
         // TODO(piyush) Changed this to check with string values. Ok?
-        return lhs->format() == rhs->format();
+        return lhs->value() == rhs->value();
 }
 
-std::size_t Environment::FnHasher::operator()(const mal::Symbol* symbol_key) const noexcept
+std::size_t Environment::FnHasher::operator()(const mal::Symbol* sym_key) const noexcept
 {
-        return std::hash<std::string>{}(symbol_key->format());
+        return std::hash<std::string>{}(sym_key->value());
 }
-
-auto Environment::lookup(mal::Data* symbol_key) const -> std::optional<mal::Function*>
-{
-        if (auto res = m_env.find(symbol_key->symbol()); res != m_env.cend())
-                return res->second->function();
-        return std::nullopt;
-}
-
 }  // namespace mal
