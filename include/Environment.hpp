@@ -6,13 +6,12 @@
 #include <string>
 #include <unordered_map>
 
+// TODO(piyush) Can we forward declare relevant types here?
+// Doesn't compile since I shifted env to main without this
+#include "types.hpp"
+
 namespace mal
 {
-
-class Data;
-class Symbol;
-class Function;
-using DataPtr = std::unique_ptr<mal::Data>;
 
 class Environment
 {

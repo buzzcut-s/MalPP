@@ -26,6 +26,7 @@ std::size_t mal::Environment::FnHasher::operator()(const mal::Symbol* key) const
 mal::Environment::Environment()
 {
         using Fn = std::function<mal::Data*(std::size_t argc, mal::Data* const* args)>;
+        using mal::Data::AllocType::Nude;
 
         Fn add_impl = [](size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc == 2);
@@ -37,7 +38,7 @@ mal::Environment::Environment()
 
                 auto res = *lhs->integer() + *rhs->integer();
                 // TODO(piyush) Memory leak :D
-                return new mal::Integer(res);
+                return new mal::Integer(res, Nude);
         };
 
         Fn subtract_impl = [](size_t argc, mal::Data* const* args) -> mal::Data* {
@@ -50,7 +51,7 @@ mal::Environment::Environment()
 
                 auto res = *lhs->integer() - *rhs->integer();
                 // TODO(piyush) Memory leak :D
-                return new mal::Integer(res);
+                return new mal::Integer(res, Nude);
         };
 
         Fn multiply_impl = [](size_t argc, mal::Data* const* args) -> mal::Data* {
@@ -63,7 +64,7 @@ mal::Environment::Environment()
 
                 auto res = *lhs->integer() * *rhs->integer();
                 // TODO(piyush) Memory leak :D
-                return new mal::Integer(res);
+                return new mal::Integer(res, Nude);
         };
 
         Fn divide_impl = [](size_t argc, mal::Data* const* args) -> mal::Data* {
@@ -76,16 +77,16 @@ mal::Environment::Environment()
 
                 auto res = *lhs->integer() / *rhs->integer();
                 // TODO(piyush) Memory leak :D
-                return new mal::Integer(res);
+                return new mal::Integer(res, Nude);
         };
 
-        m_env.emplace(new mal::Symbol("+"),
+        m_env.emplace(new mal::Symbol("+", Nude),
                       std::make_unique<mal::Function>(add_impl));
-        m_env.emplace(new mal::Symbol("-"),
+        m_env.emplace(new mal::Symbol("-", Nude),
                       std::make_unique<mal::Function>(subtract_impl));
-        m_env.emplace(new mal::Symbol("*"),
+        m_env.emplace(new mal::Symbol("*", Nude),
                       std::make_unique<mal::Function>(multiply_impl));
-        m_env.emplace(new mal::Symbol("/"),
+        m_env.emplace(new mal::Symbol("/", Nude),
                       std::make_unique<mal::Function>(divide_impl));
 };
 

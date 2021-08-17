@@ -50,6 +50,21 @@ public:
                 Function
         };
 
+        enum class AllocType
+        {
+                Unique,
+                Nude
+        };
+
+        explicit Data(AllocType alloc) :
+            m_alloc(alloc)
+        {}
+
+        [[nodiscard]] AllocType alloc_type() const
+        {
+                return m_alloc;
+        }
+
         [[nodiscard]] virtual Type type() const = 0;
 
         Integer*     integer();
@@ -61,6 +76,9 @@ public:
         HashMap*     hashmap();
         EvalHashMap* eval_hashmap();
         Function*    function();
+
+private:
+        AllocType m_alloc{};
 };
 
 using DataPtr = std::unique_ptr<mal::Data>;
@@ -68,6 +86,12 @@ using DataPtr = std::unique_ptr<mal::Data>;
 class Integer : public Data
 {
 public:
+        Integer() = delete;
+
+        explicit Integer(int int_value, AllocType alloc = AllocType::Unique) :
+            Data(alloc), m_int{int_value}
+        {}
+
         Integer(Integer const& other) = default;
         Integer& operator=(Integer const& other) = default;
 
@@ -76,9 +100,15 @@ public:
 
         ~Integer() override = default;
 
-        explicit Integer(int int_value) :
-            m_int{int_value}
-        {}
+        [[nodiscard]] std::string format() const override
+        {
+                return std::to_string(m_int);
+        }
+
+        [[nodiscard]] Type type() const override
+        {
+                return Type::Integer;
+        }
 
         int operator+(const Integer& rhs) const
         {
@@ -100,21 +130,6 @@ public:
                 return m_int / rhs.m_int;
         }
 
-        [[nodiscard]] std::string format() const override
-        {
-                return std::to_string(m_int);
-        }
-
-        [[nodiscard]] Type type() const override
-        {
-                return Type::Integer;
-        }
-
-        [[nodiscard]] int value() const
-        {
-                return m_int;
-        }
-
 private:
         int m_int;
 };
@@ -122,6 +137,12 @@ private:
 class Symbol : public Data
 {
 public:
+        Symbol() = delete;
+
+        explicit Symbol(std::string symbol, AllocType alloc = AllocType::Unique) :
+            Data(alloc), m_symbol{std::move(symbol)}
+        {}
+
         Symbol(Symbol const& other) = default;
         Symbol& operator=(Symbol const& other) = default;
 
@@ -129,10 +150,6 @@ public:
         Symbol& operator=(Symbol&& other) = default;
 
         ~Symbol() override = default;
-
-        explicit Symbol(std::string symbol) :
-            m_symbol{std::move(symbol)}
-        {}
 
         [[nodiscard]] std::string format() const override
         {
@@ -145,13 +162,18 @@ public:
         }
 
 private:
-        // TODO(piyush) char?
         std::string m_symbol;
 };
 
 class String : public Data
 {
 public:
+        String() = delete;
+
+        explicit String(std::string string, AllocType alloc = AllocType::Unique) :
+            Data(alloc), m_string{std::move(string)}
+        {}
+
         String(String const& other) = default;
         String& operator=(String const& other) = default;
 
@@ -159,10 +181,6 @@ public:
         String& operator=(String&& other) = default;
 
         ~String() override = default;
-
-        explicit String(std::string symbol) :
-            m_string{std::move(symbol)}
-        {}
 
         [[nodiscard]] std::string format() const override
         {
@@ -181,7 +199,11 @@ private:
 class List : public Data
 {
 public:
-        List() = default;
+        List() = delete;
+
+        explicit List(AllocType alloc = AllocType::Unique) :
+            Data(alloc)
+        {}
 
         List(List const& other) = default;
         List& operator=(List const& other) = default;
@@ -191,15 +213,15 @@ public:
 
         ~List() override = default;
 
-        auto begin() { return m_list.begin(); }
-        auto end() { return m_list.end(); }
-
         [[nodiscard]] std::string format() const override;
 
         [[nodiscard]] Type type() const override
         {
                 return Type::List;
         }
+
+        auto begin() { return m_list.begin(); }
+        auto end() { return m_list.end(); }
 
         void push(DataPtr value)
         {
@@ -221,11 +243,6 @@ public:
                 return m_list.at(idx).get();
         }
 
-        [[nodiscard]] auto data() const
-        {
-                return m_list.data();
-        }
-
 private:
         std::vector<DataPtr> m_list;
 };
@@ -233,7 +250,11 @@ private:
 class EvalList : public Data
 {
 public:
-        EvalList() = default;
+        EvalList() = delete;
+
+        explicit EvalList(AllocType alloc = AllocType::Unique) :
+            Data(alloc)
+        {}
 
         EvalList(EvalList const& other) = default;
         EvalList& operator=(EvalList const& other) = default;
@@ -241,10 +262,14 @@ public:
         EvalList(EvalList&& other) = default;
         EvalList& operator=(EvalList&& other) = default;
 
-        ~EvalList() override = default;
-
-        auto begin() { return m_eval_list.begin(); }
-        auto end() { return m_eval_list.end(); }
+        ~EvalList() override
+        {
+                for (auto* p : m_eval_list)
+                        // TODO(piush) Evaluate this again
+                        // Fixes Functiion::apply() memory leak
+                        if (p && p->alloc_type() == mal::Data::AllocType::Nude)
+                                delete p;
+        }
 
         [[nodiscard]] std::string format() const override;
 
@@ -252,6 +277,9 @@ public:
         {
                 return Type::EvalList;
         }
+
+        auto begin() { return m_eval_list.begin(); }
+        auto end() { return m_eval_list.end(); }
 
         void push(Data* value)
         {
@@ -280,7 +308,11 @@ private:
 class Vector : public Data
 {
 public:
-        Vector() = default;
+        Vector() = delete;
+
+        explicit Vector(AllocType alloc = AllocType::Unique) :
+            Data(alloc)
+        {}
 
         Vector(Vector const& other) = default;
         Vector& operator=(Vector const& other) = default;
@@ -290,19 +322,19 @@ public:
 
         ~Vector() override = default;
 
-        auto begin() { return m_vec.begin(); }
-        auto end() { return m_vec.end(); }
-
         [[nodiscard]] std::string format() const override;
-
-        void push(DataPtr value)
-        {
-                m_vec.push_back(std::move(value));
-        }
 
         [[nodiscard]] Type type() const override
         {
                 return Type::Vector;
+        }
+
+        auto begin() { return m_vec.begin(); }
+        auto end() { return m_vec.end(); }
+
+        void push(DataPtr value)
+        {
+                m_vec.push_back(std::move(value));
         }
 
 private:
@@ -312,7 +344,11 @@ private:
 class EvalVector : public Data
 {
 public:
-        EvalVector() = default;
+        EvalVector() = delete;
+
+        explicit EvalVector(AllocType alloc = AllocType::Unique) :
+            Data(alloc)
+        {}
 
         EvalVector(EvalVector const& other) = default;
         EvalVector& operator=(EvalVector const& other) = default;
@@ -320,10 +356,14 @@ public:
         EvalVector(EvalVector&& other) = default;
         EvalVector& operator=(EvalVector&& other) = default;
 
-        ~EvalVector() override = default;
-
-        auto begin() { return m_eval_vec.begin(); }
-        auto end() { return m_eval_vec.end(); }
+        ~EvalVector() override
+        {
+                for (auto* p : m_eval_vec)
+                        // TODO(piush) Evaluate this again
+                        // Fixes Functiion::apply() memory leak
+                        if (p && p->alloc_type() == mal::Data::AllocType::Nude)
+                                delete p;
+        }
 
         [[nodiscard]] std::string format() const override;
 
@@ -332,24 +372,12 @@ public:
                 return Type::EvalVector;
         }
 
+        auto begin() { return m_eval_vec.begin(); }
+        auto end() { return m_eval_vec.end(); }
+
         void push(Data* value)
         {
                 m_eval_vec.push_back(value);
-        }
-
-        [[nodiscard]] size_t size() const
-        {
-                return m_eval_vec.size();
-        }
-
-        [[nodiscard]] mal::Data* at(std::size_t idx) const
-        {
-                return m_eval_vec.at(idx);
-        }
-
-        [[nodiscard]] auto data() const
-        {
-                return m_eval_vec.data();
         }
 
 private:
@@ -359,7 +387,11 @@ private:
 class HashMap : public Data
 {
 public:
-        HashMap() = default;
+        HashMap() = delete;
+
+        explicit HashMap(AllocType alloc = AllocType::Unique) :
+            Data(alloc)
+        {}
 
         HashMap(HashMap const& other) = default;
         HashMap& operator=(HashMap const& other) = default;
@@ -369,10 +401,15 @@ public:
 
         ~HashMap() override = default;
 
+        [[nodiscard]] std::string format() const override;
+
+        [[nodiscard]] Type type() const override
+        {
+                return Type::HashMap;
+        }
+
         auto begin() { return m_hashmap.begin(); }
         auto end() { return m_hashmap.end(); }
-
-        [[nodiscard]] std::string format() const override;
 
         void insert(DataPtr key, DataPtr value)
         {
@@ -386,11 +423,7 @@ public:
                 return nullptr;
         }
 
-        [[nodiscard]] Type type() const override
-        {
-                return Type::HashMap;
-        }
-
+private:
         struct DataHasher
         {
                 std::size_t operator()(const DataPtr& key) const noexcept
@@ -409,14 +442,17 @@ public:
                 }
         };
 
-private:
         std::unordered_map<DataPtr, DataPtr, DataHasher, DataPred> m_hashmap;
 };
 
 class EvalHashMap : public Data
 {
 public:
-        EvalHashMap() = default;
+        EvalHashMap() = delete;
+
+        explicit EvalHashMap(AllocType alloc = AllocType::Unique) :
+            Data(alloc)
+        {}
 
         EvalHashMap(EvalHashMap const& other) = default;
         EvalHashMap& operator=(EvalHashMap const& other) = default;
@@ -424,31 +460,32 @@ public:
         EvalHashMap(EvalHashMap&& other) = default;
         EvalHashMap& operator=(EvalHashMap&& other) = default;
 
-        ~EvalHashMap() override = default;
-
-        auto begin() { return m_eval_map.begin(); }
-        auto end() { return m_eval_map.end(); }
+        ~EvalHashMap() override
+        {
+                for (auto& [key, val] : m_eval_map)
+                        // TODO(piush) Evaluate this again
+                        // Fixes Functiion::apply() memory leak
+                        if (val && val->alloc_type() == mal::Data::AllocType::Nude)
+                                delete val;
+        }
 
         [[nodiscard]] std::string format() const override;
-
-        void insert(mal::Data* key, mal::Data* value)
-        {
-                m_eval_map.emplace(key, value);
-        }
-
-        [[nodiscard]] auto find(mal::Data* key) const -> mal::Data*
-        {
-                if (auto res = m_eval_map.find(key); res != m_eval_map.cend())
-                        return res->second;
-                return nullptr;
-        }
 
         [[nodiscard]] Type type() const override
         {
                 return Type::EvalHashMap;
         }
 
-        struct DataHasher
+        auto begin() { return m_eval_map.begin(); }
+        auto end() { return m_eval_map.end(); }
+
+        void insert(mal::Data* key, mal::Data* value)
+        {
+                m_eval_map.emplace(key, value);
+        }
+
+private:
+        struct EvalDataHasher
         {
                 std::size_t operator()(const mal::Data* key) const noexcept
                 {
@@ -456,7 +493,7 @@ public:
                 }
         };
 
-        struct DataPred
+        struct EvalDataPred
         {
                 // TODO(piyush) Implement this, for real (equality)
                 bool operator()(const mal::Data* lhs, const mal::Data* rhs) const
@@ -466,8 +503,7 @@ public:
                 }
         };
 
-private:
-        std::unordered_map<mal::Data*, mal::Data*, DataHasher, DataPred> m_eval_map;
+        std::unordered_map<mal::Data*, mal::Data*, EvalDataHasher, EvalDataPred> m_eval_map;
 };
 
 class Function : public Data
@@ -475,7 +511,7 @@ class Function : public Data
 public:
         using Fn = std::function<mal::Data*(std::size_t argc, mal::Data* const* args)>;
 
-        Function() = default;
+        Function() = delete;
 
         explicit Function(Fn fn) :
             m_fn{std::move(fn)}
@@ -489,7 +525,7 @@ public:
 
         ~Function() override = default;
 
-        [[nodiscard]] std::string format() const override { return ""; }
+        [[nodiscard]] std::string format() const override { return "formatting function"; }
 
         [[nodiscard]] Type type() const override
         {

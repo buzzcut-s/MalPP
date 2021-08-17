@@ -4,10 +4,10 @@
 
 #include "../include/types.hpp"
 
-std::string pr_str(mal::Data* value)
+std::string pr_str(mal::Data* result)
 {
-        if (value)
-                return value->format();
+        if (result)
+                return result->format();
 
         // TODO(piyush): Handle this
         return "";

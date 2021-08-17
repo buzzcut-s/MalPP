@@ -11,6 +11,8 @@
 
 #include "../include/types.hpp"
 
+using mal::Data::AllocType::Unique;
+
 auto tokenize(std::string input) -> std::vector<std::string>
 {
         static const auto TOKEN_REGEX = std::regex(R"((~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]+))");
@@ -81,6 +83,7 @@ auto read_form(Reader& reader) -> mal::DataPtr
 
 auto read_atom(Reader& reader) -> mal::DataPtr
 {
+
         const auto token_val = reader.peek().value();
         reader.consume();
 
@@ -103,7 +106,7 @@ auto read_list(Reader& reader) -> mal::DataPtr
 {
         reader.consume();
 
-        auto list = std::make_unique<mal::List>();
+        auto list = std::make_unique<mal::List>(Unique);
         while (auto token = reader.peek())
         {
                 if (token.value() == ")")
@@ -122,7 +125,7 @@ auto read_vector(Reader& reader) -> mal::DataPtr
 {
         reader.consume();
 
-        auto vec = std::make_unique<mal::Vector>();
+        auto vec = std::make_unique<mal::Vector>(Unique);
         while (auto token = reader.peek())
         {
                 if (token.value() == "]")
@@ -141,7 +144,7 @@ auto read_hashmap(Reader& reader) -> mal::DataPtr
 {
         reader.consume();
 
-        auto hashmap = std::make_unique<mal::HashMap>();
+        auto hashmap = std::make_unique<mal::HashMap>(Unique);
         while (auto token = reader.peek())
         {
                 if (token.value() == "}")
@@ -175,7 +178,7 @@ auto read_special_form(Reader& reader) -> mal::DataPtr
         const char type  = token.value().front();
         reader.consume();
 
-        auto special_list = std::make_unique<mal::List>();
+        auto special_list = std::make_unique<mal::List>(Unique);
         if (type == '\'')
                 special_list->push(std::make_unique<mal::Symbol>("quote"));
         else if (type == '`')
@@ -209,7 +212,7 @@ auto read_with_meta(Reader& reader) -> mal::DataPtr
         auto value    = read_form(reader);
         if (metadata && value)
         {
-                auto metadata_list = std::make_unique<mal::List>();
+                auto metadata_list = std::make_unique<mal::List>(Unique);
                 metadata_list->push(std::make_unique<mal::Symbol>("with-meta"));
                 metadata_list->push(std::move(value));
                 metadata_list->push(std::move(metadata));

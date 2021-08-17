@@ -17,8 +17,8 @@ mal::Data* EVAL(mal::Data* ast, const mal::Environment& env);
 
 mal::Data* eval_ast(mal::Data* ast, const mal::Environment& env);
 
-std::string PRINT(mal::Data* input);
+std::string PRINT(mal::Data* result);
 
-std::string rep(std::string input);
+std::string rep(std::string input, const mal::Environment& env);
 
 #endif  // MAL_HPP

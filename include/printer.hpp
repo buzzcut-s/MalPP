@@ -9,6 +9,6 @@ namespace mal
 class Data;
 }
 
-std::string pr_str(mal::Data* value);
+std::string pr_str(mal::Data* result);
 
 #endif  // PRINTER_HPP
