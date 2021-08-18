@@ -36,4 +36,26 @@ add_executable(
   include/eval.hpp
   src/eval.cpp
   include/core.hpp
-  src/core.cpp)
+  src/core.cpp
+  include/Data.hpp
+  src/Data.cpp
+  include/types/False.hpp
+  include/types/Function.hpp
+  include/types/HashMap.hpp
+  include/types/Integer.hpp
+  include/types/List.hpp
+  include/types/Nil.hpp
+  include/types/String.hpp
+  include/types/Symbol.hpp
+  include/types/True.hpp
+  include/types/Vector.hpp
+  src/types/False.cpp
+  src/types/Function.cpp
+  src/types/HashMap.cpp
+  src/types/Integer.cpp
+  src/types/List.cpp
+  src/types/Nil.cpp
+  src/types/String.cpp
+  src/types/Symbol.cpp
+  src/types/True.cpp
+  src/types/Vector.cpp)
