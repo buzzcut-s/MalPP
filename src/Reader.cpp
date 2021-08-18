@@ -163,7 +163,6 @@ auto read_hashmap(Reader& reader) -> mal::Data*
                 token = reader.peek();
                 if (token.value() == "}")
                 {
-                        // TODO(piyush) What do?
                         std::cerr << "hashmap without value\n";
                         reader.consume();
                         return nullptr;

@@ -19,11 +19,11 @@ class Environment
 public:
         Environment() = delete;
 
-        explicit Environment(Environment* outer) :
+        explicit Environment(const Environment* outer) :
             m_outer(outer)
         {}
 
-        explicit Environment(Environment* outer, mal::List* binds, mal::List* exprs);
+        Environment(const Environment* outer, mal::List* binds, mal::List* exprs);
 
         Environment(Environment const& other) = default;
         Environment& operator=(Environment const& other) = default;
@@ -37,7 +37,6 @@ public:
         ~Environment() = default;
 
         void init();
-        void clear_inner();
         void set(const mal::Symbol* sym_key, mal::Data* mal_data);
 
         auto find_env(const mal::Symbol* sym_key) const -> const Environment*;
@@ -57,9 +56,8 @@ private:
         using EnvMap = std::unordered_map<const mal::Symbol*, mal::Data*,
                                           mal::Environment::FnHasher, mal::Environment::FnPred>;
 
-        Environment* m_outer;
-        Environment* m_inner{};
-        EnvMap       m_env{};
+        EnvMap             m_env{};
+        const Environment* m_outer;
 };
 
 }  // namespace mal

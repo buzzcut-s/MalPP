@@ -9,7 +9,7 @@
 namespace mal
 {
 
-Environment::Environment(Environment* outer, mal::List* binds, mal::List* exprs) :
+Environment::Environment(const Environment* outer, mal::List* binds, mal::List* exprs) :
     m_outer(outer)
 {
         assert(binds->size() == exprs->size());
@@ -106,7 +106,6 @@ auto Environment::lookup(const mal::Symbol* sym_key) const -> mal::Data*
 // TODO(piyush) Implement this, for real (equality)
 bool Environment::FnPred::operator()(const mal::Symbol* lhs, const mal::Symbol* rhs) const
 {
-        // TODO(piyush) Changed this to check with string values. Ok?
         return lhs->value() == rhs->value();
 }
 

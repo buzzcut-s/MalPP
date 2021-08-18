@@ -40,7 +40,6 @@ public:
         }
 
 private:
-        // TODO(piyush): Can this be a string_view?
         const std::vector<std::string>                 m_tokens;
         std::vector<std::string>::const_iterator       m_index;
         const std::vector<std::string>::const_iterator m_end;

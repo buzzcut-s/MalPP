@@ -80,14 +80,9 @@ public:
 
         [[nodiscard]] Type type() const override { return Type::Integer; }
 
-        [[nodiscard]] int value() const { return m_int; }
-
         int operator+(const Integer& rhs) const { return m_int + rhs.m_int; }
-
         int operator-(const Integer& rhs) const { return m_int - rhs.m_int; }
-
         int operator*(const Integer& rhs) const { return m_int * rhs.m_int; }
-
         int operator/(const Integer& rhs) const { return m_int / rhs.m_int; }
 
 private:
@@ -178,10 +173,8 @@ public:
         void push(mal::Data* value) { m_list.push_back(value); }
 
         [[nodiscard]] size_t size() const { return m_list.size(); }
-
-        [[nodiscard]] bool empty() const { return m_list.empty(); }
-
-        [[nodiscard]] mal::Data* at(std::size_t idx) const { return m_list.at(idx); }
+        [[nodiscard]] bool   empty() const { return m_list.empty(); }
+        [[nodiscard]] auto   at(std::size_t idx) const { return m_list.at(idx); }
 
 private:
         std::vector<mal::Data*> m_list;
@@ -210,10 +203,8 @@ public:
         void push(mal::Data* value) { m_vec.push_back(value); }
 
         [[nodiscard]] size_t size() const { return m_vec.size(); }
-
-        [[nodiscard]] bool empty() const { return m_vec.empty(); }
-
-        [[nodiscard]] mal::Data* at(std::size_t idx) const { return m_vec.at(idx); }
+        [[nodiscard]] bool   empty() const { return m_vec.empty(); }
+        [[nodiscard]] auto   at(std::size_t idx) const { return m_vec.at(idx); }
 
 private:
         std::vector<mal::Data*> m_vec;
@@ -239,35 +230,17 @@ public:
         auto begin() { return m_hashmap.begin(); }
         auto end() { return m_hashmap.end(); }
 
-        void insert(mal::Data* key, mal::Data* value)
-        {
-                m_hashmap.emplace(key, value);
-        }
-
-        [[nodiscard]] auto find(mal::Data* key) const -> mal::Data*
-        {
-                if (auto res = m_hashmap.find(key); res != m_hashmap.cend())
-                        return res->second;
-                return nullptr;
-        }
+        void insert(mal::Data* key, mal::Data* value) { m_hashmap.emplace(key, value); }
 
 private:
         struct DataHasher
         {
-                std::size_t operator()(const mal::Data* key) const noexcept
-                {
-                        return std::hash<std::string>{}(key->format());
-                }
+                std::size_t operator()(const mal::Data* key) const noexcept;
         };
 
         struct DataPred
         {
-                // TODO(piyush) Implement this, for real (equality)
-                bool operator()(const mal::Data* lhs, const mal::Data* rhs) const
-                {
-                        // TODO(piyush) Changed this to check with string values. Ok?
-                        return lhs->format() == rhs->format();
-                }
+                bool operator()(const mal::Data* lhs, const mal::Data* rhs) const;
         };
 
         std::unordered_map<mal::Data*, mal::Data*, DataHasher, DataPred> m_hashmap;
@@ -324,10 +297,7 @@ public:
 
         ~Nil() override = default;
 
-        [[nodiscard]] std::string format() const override
-        {
-                return "nil";
-        }
+        [[nodiscard]] std::string format() const override { return "nil"; }
 
         [[nodiscard]] Type type() const override { return Type::Nil; }
 
@@ -359,13 +329,10 @@ public:
 
         [[nodiscard]] auto value() const { return m_fn; }
 
-        auto apply(const size_t argc, mal::Data* const* args) const -> mal::Data*
-        {
-                return m_fn(argc, args);
-        }
+        auto apply(const size_t argc, mal::Data* const* args) const { return m_fn(argc, args); }
 
 private:
-        const Fn m_fn{};
+        Fn m_fn{};
 };
 
 }  // namespace mal

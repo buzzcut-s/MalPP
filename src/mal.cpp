@@ -22,10 +22,7 @@ mal::Data* READ(std::string input)
 mal::Data* EVAL(mal::Data* ast, mal::Environment& repl_env)
 {
         if (ast->type() != mal::Data::Type::List)
-        {
-                auto* ret = eval::eval_ast(ast, repl_env);
-                return ret;
-        }
+                return eval::eval_ast(ast, repl_env);
 
         if (ast->list()->empty())
                 return new mal::List();
@@ -52,17 +49,7 @@ mal::Data* EVAL(mal::Data* ast, mal::Environment& repl_env)
                                 return eval::eval_fn(uneval_list, repl_env);
                 }
                 default:
-                {
-                        auto* args = eval::eval_ast(ast, repl_env)->list();
-                        if (args->front() && args->front()->type() == mal::Data::Type::Function)
-                        {
-                                auto* mal_fn = args->front()->function();
-                                auto* ret    = mal_fn->apply(args->size() - 1, args->data() + 1);
-                                return ret;
-                        }
-                        std::cerr << "EVAL Default";
-                        return nullptr;
-                }
+                        return eval::eval_apply(ast, repl_env);
         }
 }
 

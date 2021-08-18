@@ -7,9 +7,6 @@
 namespace mal
 {
 
-// TODO(piush) Evaluate destructors
-// Fixes Functiion::apply() memory leak
-
 std::string List::format() const
 {
         std::string out = "(";
@@ -61,6 +58,18 @@ std::string HashMap::format() const
                 out.append("}");
 
         return out;
+}
+
+std::size_t HashMap::DataHasher::operator()(const mal::Data* key) const noexcept
+{
+        return std::hash<std::string>{}(key->format());
+}
+
+// TODO(piyush) Implement this, for real (equality)
+bool HashMap::DataPred::operator()(const mal::Data* lhs, const mal::Data* rhs) const
+{
+        // TODO(piyush) Changed this to check with string values. Ok?
+        return lhs->format() == rhs->format();
 }
 
 Symbol* Data::symbol()
