@@ -47,6 +47,9 @@ public:
                 EvalList,
                 EvalVector,
                 EvalHashMap,
+                True,
+                False,
+                Nil,
                 Function
         };
 
@@ -486,6 +489,75 @@ private:
         };
 
         std::unordered_map<mal::Data*, mal::Data*, EvalDataHasher, EvalDataPred> m_eval_map;
+};
+
+class True : public Data
+{
+public:
+        True() = delete;
+
+        explicit True(AllocType alloc = AllocType::Unique) :
+            Data(alloc)
+        {}
+
+        True(True const& other) = default;
+        True& operator=(True const& other) = default;
+
+        True(True&& other) = default;
+        True& operator=(True&& other) = default;
+
+        ~True() override = default;
+
+        [[nodiscard]] std::string format() const override { return "true"; }
+
+        [[nodiscard]] Type type() const override { return Type::True; }
+};
+
+class False : public Data
+{
+public:
+        False() = delete;
+
+        explicit False(AllocType alloc = AllocType::Unique) :
+            Data(alloc)
+        {}
+
+        False(False const& other) = default;
+        False& operator=(False const& other) = default;
+
+        False(False&& other) = default;
+        False& operator=(False&& other) = default;
+
+        ~False() override = default;
+
+        [[nodiscard]] std::string format() const override { return "false"; }
+
+        [[nodiscard]] Type type() const override { return Type::False; }
+};
+
+class Nil : public Data
+{
+public:
+        Nil() = delete;
+
+        explicit Nil(AllocType alloc = AllocType::Unique) :
+            Data(alloc)
+        {}
+
+        Nil(Nil const& other) = default;
+        Nil& operator=(Nil const& other) = default;
+
+        Nil(Nil&& other) = default;
+        Nil& operator=(Nil&& other) = default;
+
+        ~Nil() override = default;
+
+        [[nodiscard]] std::string format() const override
+        {
+                return "nil";
+        }
+
+        [[nodiscard]] Type type() const override { return Type::Nil; }
 };
 
 class Function : public Data

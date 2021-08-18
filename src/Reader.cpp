@@ -79,6 +79,13 @@ auto read_form(Reader& reader) -> mal::DataPtr
         if (type == '^')
                 return read_with_meta(reader);
 
+        if (token.value() == "true")
+                return read_true(reader);
+        if (token.value() == "false")
+                return read_false(reader);
+        if (token.value() == "nil")
+                return read_nil(reader);
+
         return read_atom(reader);
 }
 
@@ -221,4 +228,22 @@ auto read_with_meta(Reader& reader) -> mal::DataPtr
 
         std::cerr << "unbalanced";
         return nullptr;
+}
+
+auto read_true(Reader& reader) -> mal::DataPtr
+{
+        reader.consume();
+        return std::make_unique<mal::True>(Unique);
+}
+
+auto read_false(Reader& reader) -> mal::DataPtr
+{
+        reader.consume();
+        return std::make_unique<mal::False>(Unique);
+}
+
+auto read_nil(Reader& reader) -> mal::DataPtr
+{
+        reader.consume();
+        return std::make_unique<mal::Nil>(Unique);
 }

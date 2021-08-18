@@ -67,4 +67,10 @@ auto read_special_form(Reader& reader) -> mal::DataPtr;
 
 auto read_with_meta(Reader& reader) -> mal::DataPtr;
 
+auto read_true(Reader& reader) -> mal::DataPtr;
+
+auto read_false(Reader& reader) -> mal::DataPtr;
+
+auto read_nil(Reader& reader) -> mal::DataPtr;
+
 #endif  // READER_HPP
