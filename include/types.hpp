@@ -242,10 +242,16 @@ public:
 
         [[nodiscard]] Type type() const override { return Type::HashMap; }
 
+        bool operator==(Data* rhs) override;
+
         auto begin() { return m_hashmap.begin(); }
         auto end() { return m_hashmap.end(); }
 
+        [[nodiscard]] size_t size() const { return m_hashmap.size(); }
+
         void insert(mal::Data* key, mal::Data* value) { m_hashmap.emplace(key, value); }
+
+        [[nodiscard]] auto find(mal::Data* key) const -> mal::Data*;
 
 private:
         struct DataHasher
