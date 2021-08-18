@@ -7,7 +7,6 @@
 namespace mal
 {
 class Data;
-class List;
 class Environment;
 using DataPtr = std::unique_ptr<mal::Data>;
 }  // namespace mal
@@ -15,8 +14,6 @@ using DataPtr = std::unique_ptr<mal::Data>;
 mal::DataPtr READ(std::string input);
 
 mal::Data* EVAL(mal::Data* ast, mal::Environment& repl_env);
-
-mal::Data* eval_ast(mal::Data* ast, mal::Environment& repl_env);
 
 std::string PRINT(mal::Data* result);
 
