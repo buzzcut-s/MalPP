@@ -23,7 +23,7 @@ mal::Data* eval_ast(mal::Data* ast, mal::Environment& repl_env)
 
                 case mal::Data::Type::List:
                 {
-                        auto* eval_list = new mal::List();
+                        auto* eval_list = new mal::List;
                         for (auto& val : *ast->list())
                                 eval_list->push(EVAL(val, repl_env));
                         return eval_list;
@@ -31,7 +31,7 @@ mal::Data* eval_ast(mal::Data* ast, mal::Environment& repl_env)
 
                 case mal::Data::Type::Vector:
                 {
-                        auto* eval_vec = new mal::Vector();
+                        auto* eval_vec = new mal::Vector;
                         for (auto& val : *ast->vector())
                                 eval_vec->push(EVAL(val, repl_env));
                         return eval_vec;
@@ -39,7 +39,7 @@ mal::Data* eval_ast(mal::Data* ast, mal::Environment& repl_env)
 
                 case mal::Data::Type::HashMap:
                 {
-                        auto* eval_map = new mal::HashMap();
+                        auto* eval_map = new mal::HashMap;
                         for (auto& [key, val] : *ast->hashmap())
                                 eval_map->insert(key, EVAL(val, repl_env));
                         return eval_map;
@@ -106,7 +106,7 @@ mal::Data* eval_if(mal::List* uneval_list, mal::Environment& repl_env)
         }
 
         auto* false_expr = (uneval_list->size() > 3) ? uneval_list->at(3)
-                                                     : new mal::Nil();
+                                                     : new mal::Nil;
         return EVAL(false_expr, repl_env);
 }
 
@@ -117,7 +117,7 @@ mal::Data* eval_fn(mal::List* uneval_list, const mal::Environment& repl_env)
 
         auto closure = [&repl_env, binds, fn_body](const std::size_t argc, mal::Data* const* args)
             -> mal::Data* {
-                auto* exprs = new mal::List();
+                auto* exprs = new mal::List;
                 for (size_t i = 0; i < argc; ++i)
                         exprs->push(args[i]);
                 auto* fn_env = new mal::Environment(&repl_env, binds, exprs);

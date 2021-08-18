@@ -25,7 +25,7 @@ mal::Data* EVAL(mal::Data* ast, mal::Environment& repl_env)
                 return eval::eval_ast(ast, repl_env);
 
         if (ast->list()->empty())
-                return new mal::List();
+                return new mal::List;
 
         auto* uneval_list = ast->list();
         switch (uneval_list->front()->type())

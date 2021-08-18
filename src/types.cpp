@@ -7,6 +7,12 @@
 namespace mal
 {
 
+bool Integer::operator==(Data* rhs)
+{
+        return rhs->type() == mal::Data::Type::Integer
+               && this->value() == rhs->integer()->value();
+}
+
 std::string List::format() const
 {
         std::string out = "(";
@@ -22,6 +28,20 @@ std::string List::format() const
                 out.append(")");
 
         return out;
+}
+
+bool List::operator==(Data* rhs)
+{
+        if (rhs->type() != mal::Data::Type::List)
+                return false;
+        if (this->size() != rhs->list()->size())
+                return false;
+        for (size_t i = 0; i < this->size(); ++i)
+        {
+                if (!(this->at(i) == rhs->list()->at(i)))
+                        return false;
+        }
+        return true;
 }
 
 std::string Vector::format() const

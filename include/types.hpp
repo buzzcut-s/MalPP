@@ -51,6 +51,8 @@ public:
 
         [[nodiscard]] virtual bool is_truthy() const { return true; }
 
+        virtual bool operator==(Data* /*rhs*/) { return false; }
+
         Symbol*   symbol();
         List*     list();
         Vector*   vector();
@@ -80,10 +82,14 @@ public:
 
         [[nodiscard]] Type type() const override { return Type::Integer; }
 
+        bool operator==(Data* rhs) override;
+
         int operator+(const Integer& rhs) const { return m_int + rhs.m_int; }
         int operator-(const Integer& rhs) const { return m_int - rhs.m_int; }
         int operator*(const Integer& rhs) const { return m_int * rhs.m_int; }
         int operator/(const Integer& rhs) const { return m_int / rhs.m_int; }
+
+        [[nodiscard]] int value() const { return m_int; }
 
 private:
         int m_int;
@@ -163,6 +169,8 @@ public:
         [[nodiscard]] std::string format() const override;
 
         [[nodiscard]] Type type() const override { return Type::List; }
+
+        bool operator==(Data* rhs) override;
 
         auto begin() { return m_list.begin(); }
         auto end() { return m_list.end(); }
