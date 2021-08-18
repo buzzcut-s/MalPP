@@ -11,6 +11,30 @@
 
 #include "../include/types.hpp"
 
+Reader::Reader(std::vector<std::string> tokens) :
+    m_tokens(std::move(tokens)),
+    m_index(m_tokens.cbegin()),
+    m_end(m_tokens.cend())
+{
+}
+
+auto Reader::peek() const -> std::optional<std::string>
+{
+        if (!eof()) return *m_index;
+        return std::nullopt;
+}
+
+auto Reader::next() -> std::optional<std::string>
+{
+        if (!eof()) return *m_index++;
+        return std::nullopt;
+}
+
+void Reader::consume()
+{
+        if (!eof()) ++m_index;
+}
+
 auto tokenize(std::string input) -> std::vector<std::string>
 {
         static const auto TOKEN_REGEX =

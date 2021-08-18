@@ -1,10 +1,8 @@
 #ifndef READER_HPP
 #define READER_HPP
 
-#include <memory>
 #include <optional>
 #include <string>
-#include <utility>
 #include <vector>
 
 namespace mal
@@ -15,29 +13,13 @@ class Data;
 class Reader
 {
 public:
-        explicit Reader(std::vector<std::string> tokens) :
-            m_tokens(std::move(tokens)),
-            m_index(m_tokens.cbegin()),
-            m_end(m_tokens.cend())
-        {
-        }
+        explicit Reader(std::vector<std::string> tokens);
 
-        [[nodiscard]] auto peek() const -> std::optional<std::string>
-        {
-                if (!eof()) return *m_index;
-                return std::nullopt;
-        }
+        [[nodiscard]] auto peek() const -> std::optional<std::string>;
 
-        [[nodiscard]] auto next() -> std::optional<std::string>
-        {
-                if (!eof()) return *m_index++;
-                return std::nullopt;
-        }
+        [[nodiscard]] auto next() -> std::optional<std::string>;
 
-        void consume()
-        {
-                if (!eof()) ++m_index;
-        }
+        void consume();
 
 private:
         const std::vector<std::string>                 m_tokens;

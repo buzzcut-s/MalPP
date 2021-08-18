@@ -1,18 +1,16 @@
 #ifndef ENVIRONMENT_HPP
 #define ENVIRONMENT_HPP
 
+#include <functional>
 #include <memory>
-#include <optional>
 #include <string>
 #include <unordered_map>
-#include <utility>
-
-// TODO(piyush) Can we forward declare relevant types here?
-// Doesn't compile since I shifted env to main without this
-#include "types.hpp"
 
 namespace mal
 {
+class Data;
+class List;
+class Symbol;
 
 class Environment
 {

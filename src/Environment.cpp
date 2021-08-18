@@ -8,7 +8,6 @@
 
 namespace mal
 {
-
 using Fn = std::function<mal::Data*(const std::size_t argc, mal::Data* const* args)>;
 
 Environment::Environment(const Environment* outer, mal::List* binds, mal::List* exprs) :

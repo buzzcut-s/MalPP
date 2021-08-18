@@ -1,7 +1,6 @@
 #ifndef MAL_HPP
 #define MAL_HPP
 
-#include <memory>
 #include <string>
 
 namespace mal

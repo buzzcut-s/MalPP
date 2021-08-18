@@ -1,7 +1,6 @@
 #ifndef PRINTER_HPP
 #define PRINTER_HPP
 
-#include <memory>
 #include <string>
 
 namespace mal

@@ -11,11 +11,11 @@
 namespace mal
 {
 
-class Integer;
 class Symbol;
 class List;
 class Vector;
 class HashMap;
+class Integer;
 class Function;
 
 class Data
