@@ -43,6 +43,9 @@ public:
         auto lookup(const mal::Symbol* sym_key) const -> mal::Data*;
 
 private:
+        void init_binds(mal::List* binds, mal::List* exprs);
+        void set_var_binds(mal::Symbol* var_key, mal::List* var_exprs, size_t var_idx);
+
         struct FnHasher
         {
                 std::size_t operator()(const mal::Symbol* sym_key) const noexcept;

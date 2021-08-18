@@ -126,6 +126,7 @@ public:
         [[nodiscard]] bool is_do() const { return m_symbol == "do"; }
         [[nodiscard]] bool is_if() const { return m_symbol == "if"; }
         [[nodiscard]] bool is_fn() const { return m_symbol == "fn*"; }
+        [[nodiscard]] bool is_variadic() const { return m_symbol == "&"; }
 
 private:
         std::string m_symbol;

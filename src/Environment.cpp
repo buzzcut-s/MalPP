@@ -13,13 +13,41 @@ using Fn = std::function<mal::Data*(const std::size_t argc, mal::Data* const* ar
 Environment::Environment(const Environment* outer, mal::List* binds, mal::List* exprs) :
     m_outer(outer)
 {
-        assert(binds->size() == exprs->size());
+        init_binds(binds, exprs);
+}
+
+void Environment::init_binds(mal::List* binds, mal::List* exprs)
+{
         for (size_t i = 0; i < binds->size(); ++i)
         {
-                auto* sym_key  = binds->at(i)->symbol();
+                auto* sym_key = binds->at(i)->symbol();
+                if (sym_key->is_variadic())
+                {
+                        if (i + 1 >= binds->size())
+                        {
+                                std::cerr << "missing symbol after &";
+                                return;
+                        }
+                        auto* var_key = binds->at(i + 1)->symbol();
+                        set_var_binds(var_key, exprs, i);
+                        return;
+                }
+                if (i >= exprs->size())
+                {
+                        std::cerr << "not enough arguments";
+                        return;
+                }
                 auto* mal_data = exprs->at(i);
                 set(sym_key, mal_data);
         }
+}
+
+void Environment::set_var_binds(mal::Symbol* var_key, mal::List* var_exprs, size_t var_idx)
+{
+        auto* var_exprs_list = new mal::List;
+        for (size_t i = var_idx; i < var_exprs->size(); ++i)
+                var_exprs_list->push(var_exprs->at(i));
+        set(var_key, var_exprs_list);
 }
 
 void Environment::init(std::unordered_map<std::string, Fn> core_ns)
