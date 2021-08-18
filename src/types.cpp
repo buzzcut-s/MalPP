@@ -17,6 +17,7 @@ EvalList::~EvalList()
                 if (ptr && ptr->alloc_type() == mal::Data::AllocType::Nude)
                         delete ptr;
         }
+        m_eval_list.clear();
 }
 
 CloneList::~CloneList()
@@ -26,6 +27,7 @@ CloneList::~CloneList()
                 if (ptr && ptr->alloc_type() == mal::Data::AllocType::Clone)
                         delete ptr;
         }
+        m_clone_list.clear();
 }
 
 EvalVector::~EvalVector()
@@ -35,6 +37,7 @@ EvalVector::~EvalVector()
                 if (ptr && ptr->alloc_type() == mal::Data::AllocType::Nude)
                         delete ptr;
         }
+        m_eval_vec.clear();
 }
 
 CloneVector::~CloneVector()
@@ -44,6 +47,7 @@ CloneVector::~CloneVector()
                 if (ptr && ptr->alloc_type() == mal::Data::AllocType::Clone)
                         delete ptr;
         }
+        m_clone_vec.clear();
 }
 
 EvalHashMap::~EvalHashMap()
@@ -53,6 +57,7 @@ EvalHashMap::~EvalHashMap()
                 if (val && val->alloc_type() == mal::Data::AllocType::Nude)
                         delete val;
         }
+        m_eval_map.clear();
 }
 
 std::string List::format() const

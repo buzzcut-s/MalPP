@@ -90,7 +90,11 @@ static mal::Data* eval_let_list(mal::List* uneval_list, mal::Environment& new_en
                 auto* sym_key = bindings->at(i);
                 assert(i + 1 < bindings->size());
                 if (auto* mal_data = EVAL(bindings->at(i + 1), new_env); mal_data)
+                {
                         new_env.set(clone(sym_key)->symbol(), clone(mal_data));
+                        if (mal_data->alloc_type() == mal::Data::AllocType::Nude)
+                                delete mal_data;
+                }
         }
         return EVAL(uneval_list->at(2), new_env);
 }
@@ -103,22 +107,26 @@ static mal::Data* eval_let_vec(mal::List* uneval_list, mal::Environment& new_env
                 auto* sym_key = bindings->at(i);
                 assert(i + 1 < bindings->size());
                 if (auto* mal_data = EVAL(bindings->at(i + 1), new_env); mal_data)
+                {
                         new_env.set(clone(sym_key)->symbol(), clone(mal_data));
+                        if (mal_data->alloc_type() == mal::Data::AllocType::Nude)
+                                delete mal_data;
+                }
         }
         return EVAL(uneval_list->at(2), new_env);
 }
 
 static mal::Data* clone(mal::Data* mal_data)
 {
-
+        // TODO(piyush) This leaks memory, which by all means, it shouldn't.
         using mal::Data::AllocType::Clone;
         switch (mal_data->type())
         {
-                case mal::Data::Type::Symbol:
+                case mal::Data::Type::Symbol:  // Leak
                         return new mal::Symbol(mal_data->symbol()->value(), Clone);
-                case mal::Data::Type::Integer:
+                case mal::Data::Type::Integer:  // Leak
                         return new mal::Integer(mal_data->integer()->value(), Clone);
-                case mal::Data::Type::List:
+                case mal::Data::Type::List:  // This doesn't leak
                 {
                         auto* clone_list = new mal::CloneList(Clone);
                         for (auto& ptr : *mal_data->list())
@@ -127,7 +135,7 @@ static mal::Data* clone(mal::Data* mal_data)
                         }
                         return clone_list;
                 }
-                case mal::Data::Type::Vector:
+                case mal::Data::Type::Vector:  // This also doesn't leak
                 {
                         auto* clone_vec = new mal::CloneVector(Clone);
                         for (auto& ptr : *mal_data->vector())

@@ -24,7 +24,11 @@ mal::Data* EVAL(mal::Data* ast, mal::Environment& repl_env)
         using mal::Data::AllocType::Nude;
 
         if (ast->type() != mal::Data::Type::List)
-                return eval::eval_ast(ast, repl_env);
+        {
+                auto* ret = eval::eval_ast(ast, repl_env);
+                repl_env.clear_inner();
+                return ret;
+        }
 
         if (ast->list()->empty())
                 return new mal::List(Nude);
@@ -36,22 +40,33 @@ mal::Data* EVAL(mal::Data* ast, mal::Environment& repl_env)
                 {
                         auto* first = uneval_list->front()->symbol();
                         if (first->is_def())
-                                return eval::eval_def(uneval_list, repl_env);
+                        {
+                                auto* ret = eval::eval_def(uneval_list, repl_env);
+                                repl_env.clear_inner();
+                                return ret;
+                        }
 
                         if (first->is_let())
-                                return eval::eval_let(uneval_list, repl_env);
+                        {
+                                auto* ret = eval::eval_let(uneval_list, repl_env);
+                                repl_env.clear_inner();
+                                return ret;
+                        }
                 }
                 default:
                 {
                         auto* args = eval::eval_ast(ast, repl_env)->eval_list();
+                        repl_env.clear_inner();
                         if (args->front() && args->front()->type() == mal::Data::Type::Function)
                         {
                                 auto* mal_fn = args->front()->function();
                                 auto* ret    = mal_fn->apply(args->size() - 1, args->data() + 1);
-                                delete args;
+                                if (args->alloc_type() == mal::Data::AllocType::Nude)
+                                        delete args;
                                 return ret;
                         }
-                        delete args;
+                        if (args->alloc_type() == mal::Data::AllocType::Nude)
+                                delete args;
                         std::cerr << "EVAL Default";
                         return nullptr;
                 }

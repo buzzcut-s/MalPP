@@ -54,7 +54,8 @@ public:
         {
                 Unique,
                 Nude,
-                Clone
+                Clone,
+                Init
         };
 
         explicit Data(AllocType alloc) :
@@ -494,7 +495,8 @@ public:
 
         Function() = delete;
 
-        explicit Function(Fn fn) :
+        explicit Function(Fn fn, AllocType alloc = AllocType::Nude) :
+            Data(alloc),
             m_fn{std::move(fn)}
         {}
 

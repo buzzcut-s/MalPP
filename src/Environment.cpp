@@ -13,9 +13,12 @@ Environment::~Environment()
 {
         for (auto& [symbol_key, fn] : m_env)
         {
-                delete fn;
-                delete symbol_key;
+                if (fn && fn->alloc_type() == mal::Data::AllocType::Nude)
+                        delete fn;
+                if (symbol_key && symbol_key->alloc_type() == mal::Data::AllocType::Nude)
+                        delete symbol_key;
         }
+        m_env.clear();
 }
 
 void Environment::init()
@@ -71,10 +74,23 @@ void Environment::init()
                 return new mal::Integer(res, Nude);
         };
 
-        set(new mal::Symbol("+", Nude), new mal::Function(add_impl));
-        set(new mal::Symbol("-", Nude), new mal::Function(subtract_impl));
-        set(new mal::Symbol("*", Nude), new mal::Function(multiply_impl));
-        set(new mal::Symbol("/", Nude), new mal::Function(divide_impl));
+        using mal::Data::AllocType::Init;
+        set(new mal::Symbol("+", Init), new mal::Function(add_impl, Init));
+        set(new mal::Symbol("-", Init), new mal::Function(subtract_impl, Init));
+        set(new mal::Symbol("*", Init), new mal::Function(multiply_impl, Init));
+        set(new mal::Symbol("/", Init), new mal::Function(divide_impl, Init));
+}
+
+void Environment::uninit()
+{
+        for (auto& [symbol_key, fn] : m_env)
+        {
+                if (fn && fn->alloc_type() == mal::Data::AllocType::Init)
+                        delete fn;
+                if (symbol_key && symbol_key->alloc_type() == mal::Data::AllocType::Init)
+                        delete symbol_key;
+        }
+        m_env.clear();
 }
 
 void Environment::clear_inner()
