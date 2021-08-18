@@ -5,6 +5,7 @@
 #include "types/Function.hpp"
 #include "types/HashMap.hpp"
 #include "types/Integer.hpp"
+#include "types/Keyword.hpp"
 #include "types/List.hpp"
 #include "types/Nil.hpp"
 #include "types/String.hpp"

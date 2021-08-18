@@ -11,6 +11,7 @@ class List;
 class Vector;
 class HashMap;
 class Integer;
+class Keyword;
 class String;
 class Function;
 
@@ -36,6 +37,7 @@ public:
                 Vector,
                 HashMap,
                 Integer,
+                Keyword,
                 String,
                 True,
                 False,
@@ -55,6 +57,7 @@ public:
         Vector*   vector();
         HashMap*  hashmap();
         Integer*  integer();
+        Keyword*  keyword();
         String*   string();
         Function* function();
 };

@@ -37,6 +37,12 @@ Integer* Data::integer()
         return static_cast<Integer*>(this);
 }
 
+Keyword* Data::keyword()
+{
+        assert(this->type() == Type::Keyword);
+        return static_cast<Keyword*>(this);
+}
+
 String* Data::string()
 {
         assert(this->type() == Type::String);

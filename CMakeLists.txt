@@ -43,6 +43,7 @@ add_executable(
   include/types/Function.hpp
   include/types/HashMap.hpp
   include/types/Integer.hpp
+  include/types/Keyword.hpp
   include/types/List.hpp
   include/types/Nil.hpp
   include/types/String.hpp
@@ -53,6 +54,7 @@ add_executable(
   src/types/Function.cpp
   src/types/HashMap.cpp
   src/types/Integer.cpp
+  src/types/Keyword.cpp
   src/types/List.cpp
   src/types/Nil.cpp
   src/types/String.cpp

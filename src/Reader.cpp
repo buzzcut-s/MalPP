@@ -100,6 +100,8 @@ auto read_form(Reader& reader) -> mal::Data*
                 return read_special_form(reader);
         if (type == '^')
                 return read_with_meta(reader);
+        if (type == ':')
+                return read_keyword(reader);
 
         if (token.value() == "true")
                 return read_true(reader);
@@ -249,6 +251,14 @@ auto read_with_meta(Reader& reader) -> mal::Data*
 
         std::cerr << "unbalanced";
         return nullptr;
+}
+
+auto read_keyword(Reader& reader) -> mal::Data*
+{
+        const auto token_val = reader.peek().value();
+        reader.consume();
+
+        return new (mal::Keyword)(token_val);
 }
 
 auto read_true(Reader& reader) -> mal::Data*

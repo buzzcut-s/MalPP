@@ -57,7 +57,7 @@ mal::Data* eval_apply(mal::Data* ast, mal::Environment& repl_env)
                 auto* mal_fn = args->front()->function();
                 return mal_fn->apply(args->size() - 1, args->data() + 1);
         }
-        std::cerr << "EVAL Default";
+        std::cerr << "EVAL apply - from EVAL default";
         return nullptr;
 }
 

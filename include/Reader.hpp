@@ -47,6 +47,8 @@ auto read_special_form(Reader& reader) -> mal::Data*;
 
 auto read_with_meta(Reader& reader) -> mal::Data*;
 
+auto read_keyword(Reader& reader) -> mal::Data*;
+
 auto read_true(Reader& reader) -> mal::Data*;
 
 auto read_false(Reader& reader) -> mal::Data*;
