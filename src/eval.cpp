@@ -92,7 +92,7 @@ mal::Data* eval_do(mal::List* uneval_list, mal::Environment& repl_env)
         mal::Data* result{};
         assert(uneval_list->size() > 1);
         for (size_t i = 1; i < uneval_list->size(); ++i)
-                result = eval::eval_ast(uneval_list->at(i), repl_env);
+                result = EVAL(uneval_list->at(i), repl_env);
         return result;
 }
 

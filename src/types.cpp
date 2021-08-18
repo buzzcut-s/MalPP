@@ -13,6 +13,12 @@ bool Integer::operator==(Data* rhs)
                && this->value() == rhs->integer()->value();
 }
 
+bool String::operator==(Data* rhs)
+{
+        return rhs->type() == mal::Data::Type::String
+               && this->value() == rhs->string()->value();
+}
+
 std::string List::format() const
 {
         std::string out = "(";
@@ -38,7 +44,7 @@ bool List::operator==(Data* rhs)
                 return false;
         for (size_t i = 0; i < this->size(); ++i)
         {
-                if (!(this->at(i) == rhs->list()->at(i)))
+                if (*this->at(i) != rhs->list()->at(i))
                         return false;
         }
         return true;
@@ -120,6 +126,12 @@ Integer* Data::integer()
 {
         assert(this->type() == Type::Integer);
         return static_cast<Integer*>(this);
+}
+
+String* Data::string()
+{
+        assert(this->type() == Type::String);
+        return static_cast<String*>(this);
 }
 
 Function* Data::function()

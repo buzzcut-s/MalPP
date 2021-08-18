@@ -16,6 +16,7 @@ class List;
 class Vector;
 class HashMap;
 class Integer;
+class String;
 class Function;
 
 class Data
@@ -52,12 +53,14 @@ public:
         [[nodiscard]] virtual bool is_truthy() const { return true; }
 
         virtual bool operator==(Data* /*rhs*/) { return false; }
+        virtual bool operator!=(Data* rhs) { return !(*this == rhs); }
 
         Symbol*   symbol();
         List*     list();
         Vector*   vector();
         HashMap*  hashmap();
         Integer*  integer();
+        String*   string();
         Function* function();
 };
 
@@ -148,6 +151,10 @@ public:
         [[nodiscard]] std::string format() const override { return m_string; }
 
         [[nodiscard]] Type type() const override { return Type::String; }
+
+        bool operator==(Data* rhs) override;
+
+        [[nodiscard]] std::string value() const { return m_string; }
 
 private:
         std::string m_string;
@@ -270,6 +277,8 @@ public:
         [[nodiscard]] std::string format() const override { return "true"; }
 
         [[nodiscard]] Type type() const override { return Type::True; }
+
+        bool operator==(Data* rhs) override { return rhs->type() == Type::True; }
 };
 
 class False : public Data
@@ -290,6 +299,8 @@ public:
         [[nodiscard]] Type type() const override { return Type::False; }
 
         [[nodiscard]] bool is_truthy() const override { return false; }
+
+        bool operator==(Data* rhs) override { return rhs->type() == Type::False; }
 };
 
 class Nil : public Data
@@ -310,6 +321,8 @@ public:
         [[nodiscard]] Type type() const override { return Type::Nil; }
 
         [[nodiscard]] bool is_truthy() const override { return false; }
+
+        bool operator==(Data* rhs) override { return rhs->type() == Type::Nil; }
 };
 
 class Function : public Data
