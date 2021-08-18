@@ -35,6 +35,7 @@ public:
         ~Environment();
 
         void init();
+        void clear_inner();
         void set_inner(Environment* inner) { m_inner = inner; }
         void set(const mal::Symbol* sym_key, mal::Data* mal_data);
 

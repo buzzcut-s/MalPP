@@ -16,7 +16,6 @@ Environment::~Environment()
                 delete fn;
                 delete symbol_key;
         }
-        delete m_inner;
 }
 
 void Environment::init()
@@ -76,6 +75,12 @@ void Environment::init()
         set(new mal::Symbol("-", Nude), new mal::Function(subtract_impl));
         set(new mal::Symbol("*", Nude), new mal::Function(multiply_impl));
         set(new mal::Symbol("/", Nude), new mal::Function(divide_impl));
+}
+
+void Environment::clear_inner()
+{
+        delete m_inner;
+        m_inner = nullptr;
 }
 
 void Environment::set(const mal::Symbol* sym_key, mal::Data* mal_data)
