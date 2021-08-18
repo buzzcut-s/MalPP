@@ -11,8 +11,6 @@
 
 #include "../include/types.hpp"
 
-using mal::Data::AllocType::Unique;
-
 auto tokenize(std::string input) -> std::vector<std::string>
 {
         static const auto TOKEN_REGEX =
@@ -52,14 +50,14 @@ auto tokenize(std::string input) -> std::vector<std::string>
         return out;
 }
 
-auto read_str(std::string input) -> mal::DataPtr
+auto read_str(std::string input) -> mal::Data*
 {
         auto reader = Reader(tokenize(std::move(input)));
 
         return read_form(reader);
 }
 
-auto read_form(Reader& reader) -> mal::DataPtr
+auto read_form(Reader& reader) -> mal::Data*
 {
         const auto token = reader.peek();
 
@@ -89,13 +87,13 @@ auto read_form(Reader& reader) -> mal::DataPtr
         return read_atom(reader);
 }
 
-auto read_atom(Reader& reader) -> mal::DataPtr
+auto read_atom(Reader& reader) -> mal::Data*
 {
         const auto token_val = reader.peek().value();
         reader.consume();
 
         if (token_val.front() == '"')
-                return std::make_unique<mal::String>(token_val);
+                return new (mal::String)(token_val);
 
         int int_val{};
         if (const auto [p, ec] =
@@ -103,17 +101,17 @@ auto read_atom(Reader& reader) -> mal::DataPtr
                                 int_val);
             ec == std::errc())
         {
-                return std::make_unique<mal::Integer>(int_val);
+                return new (mal::Integer)(int_val);
         }
 
-        return std::make_unique<mal::Symbol>(token_val);
+        return new (mal::Symbol)(token_val);
 }
 
-auto read_list(Reader& reader) -> mal::DataPtr
+auto read_list(Reader& reader) -> mal::Data*
 {
         reader.consume();
 
-        auto list = std::make_unique<mal::List>(Unique);
+        auto* list = new (mal::List)();
         while (auto token = reader.peek())
         {
                 if (token.value() == ")")
@@ -128,11 +126,11 @@ auto read_list(Reader& reader) -> mal::DataPtr
         return nullptr;
 }
 
-auto read_vector(Reader& reader) -> mal::DataPtr
+auto read_vector(Reader& reader) -> mal::Data*
 {
         reader.consume();
 
-        auto vec = std::make_unique<mal::Vector>(Unique);
+        auto* vec = new (mal::Vector)();
         while (auto token = reader.peek())
         {
                 if (token.value() == "]")
@@ -147,11 +145,11 @@ auto read_vector(Reader& reader) -> mal::DataPtr
         return nullptr;
 }
 
-auto read_hashmap(Reader& reader) -> mal::DataPtr
+auto read_hashmap(Reader& reader) -> mal::Data*
 {
         reader.consume();
 
-        auto hashmap = std::make_unique<mal::HashMap>(Unique);
+        auto* hashmap = new (mal::HashMap)();
         while (auto token = reader.peek())
         {
                 if (token.value() == "}")
@@ -160,7 +158,7 @@ auto read_hashmap(Reader& reader) -> mal::DataPtr
                         return hashmap;
                 }
 
-                auto key = read_form(reader);
+                auto* key = read_form(reader);
 
                 token = reader.peek();
                 if (token.value() == "}")
@@ -171,39 +169,39 @@ auto read_hashmap(Reader& reader) -> mal::DataPtr
                         return nullptr;
                 }
 
-                auto value = read_form(reader);
-                hashmap->insert(std::move(key), std::move(value));
+                auto* value = read_form(reader);
+                hashmap->insert(key, value);
         }
 
         std::cerr << "unbalanced";
         return nullptr;
 }
 
-auto read_special_form(Reader& reader) -> mal::DataPtr
+auto read_special_form(Reader& reader) -> mal::Data*
 {
         const auto token = reader.peek();
         const char type  = token.value().front();
         reader.consume();
 
-        auto special_list = std::make_unique<mal::List>(Unique);
+        auto* special_list = new (mal::List)();
         if (type == '\'')
-                special_list->push(std::make_unique<mal::Symbol>("quote"));
+                special_list->push(new (mal::Symbol)("quote"));
         else if (type == '`')
-                special_list->push(std::make_unique<mal::Symbol>("quasiquote"));
+                special_list->push(new (mal::Symbol)("quasiquote"));
         else if (type == '~')
         {
                 const bool unquoted = (token.value().length() == 1);
                 if (unquoted)
-                        special_list->push(std::make_unique<mal::Symbol>("unquote"));
+                        special_list->push(new (mal::Symbol)("unquote"));
                 else
-                        special_list->push(std::make_unique<mal::Symbol>("splice-unquote"));
+                        special_list->push(new (mal::Symbol)("splice-unquote"));
         }
         else if (type == '@')
-                special_list->push(std::make_unique<mal::Symbol>("deref"));
+                special_list->push(new (mal::Symbol)("deref"));
 
-        if (auto val = read_form(reader); val)
+        if (auto* val = read_form(reader); val)
         {
-                special_list->push(std::move(val));
+                special_list->push(val);
                 return special_list;
         }
 
@@ -211,18 +209,18 @@ auto read_special_form(Reader& reader) -> mal::DataPtr
         return nullptr;
 }
 
-auto read_with_meta(Reader& reader) -> mal::DataPtr
+auto read_with_meta(Reader& reader) -> mal::Data*
 {
         reader.consume();
 
-        auto metadata = read_form(reader);
-        auto value    = read_form(reader);
+        auto* metadata = read_form(reader);
+        auto* value    = read_form(reader);
         if (metadata && value)
         {
-                auto metadata_list = std::make_unique<mal::List>(Unique);
-                metadata_list->push(std::make_unique<mal::Symbol>("with-meta"));
-                metadata_list->push(std::move(value));
-                metadata_list->push(std::move(metadata));
+                auto* metadata_list = new (mal::List)();
+                metadata_list->push(new (mal::Symbol)("with-meta"));
+                metadata_list->push(value);
+                metadata_list->push(metadata);
                 return metadata_list;
         }
 
@@ -230,20 +228,20 @@ auto read_with_meta(Reader& reader) -> mal::DataPtr
         return nullptr;
 }
 
-auto read_true(Reader& reader) -> mal::DataPtr
+auto read_true(Reader& reader) -> mal::Data*
 {
         reader.consume();
-        return std::make_unique<mal::True>(Unique);
+        return new (mal::True)();
 }
 
-auto read_false(Reader& reader) -> mal::DataPtr
+auto read_false(Reader& reader) -> mal::Data*
 {
         reader.consume();
-        return std::make_unique<mal::False>(Unique);
+        return new (mal::False)();
 }
 
-auto read_nil(Reader& reader) -> mal::DataPtr
+auto read_nil(Reader& reader) -> mal::Data*
 {
         reader.consume();
-        return std::make_unique<mal::Nil>(Unique);
+        return new (mal::Nil)();
 }

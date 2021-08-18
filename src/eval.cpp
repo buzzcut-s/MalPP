@@ -14,40 +14,34 @@ static mal::Data* eval_let_list(mal::List* uneval_list, mal::Environment& new_en
 
 static mal::Data* eval_let_vec(mal::List* uneval_list, mal::Environment& new_env);
 
-static mal::Data* clone(mal::Data* mal_data);
-
 mal::Data* eval_ast(mal::Data* ast, mal::Environment& repl_env)
 {
-        using mal::Data::AllocType::Nude;
-
         switch (ast->type())
         {
                 case mal::Data::Type::Symbol:
-                {
                         return repl_env.lookup(ast->symbol());
-                }
 
                 case mal::Data::Type::List:
                 {
-                        auto* eval_list = new mal::EvalList(Nude);
+                        auto* eval_list = new mal::List();
                         for (auto& val : *ast->list())
-                                eval_list->push(EVAL(val.get(), repl_env));
+                                eval_list->push(EVAL(val, repl_env));
                         return eval_list;
                 }
 
                 case mal::Data::Type::Vector:
                 {
-                        auto* eval_vec = new mal::EvalVector(Nude);
+                        auto* eval_vec = new mal::Vector();
                         for (auto& val : *ast->vector())
-                                eval_vec->push(EVAL(val.get(), repl_env));
+                                eval_vec->push(EVAL(val, repl_env));
                         return eval_vec;
                 }
 
                 case mal::Data::Type::HashMap:
                 {
-                        auto* eval_map = new mal::EvalHashMap(Nude);
+                        auto* eval_map = new mal::HashMap();
                         for (auto& [key, val] : *ast->hashmap())
-                                eval_map->insert(key.get(), EVAL(val.get(), repl_env));
+                                eval_map->insert(key, EVAL(val, repl_env));
                         return eval_map;
                 }
                 default:
@@ -60,7 +54,7 @@ mal::Data* eval_def(mal::List* uneval_list, mal::Environment& repl_env)
         auto* sym_key = uneval_list->at(1);
         if (auto* mal_data = EVAL(uneval_list->at(2), repl_env); mal_data)
         {
-                repl_env.set(clone(sym_key)->symbol(), clone(mal_data));
+                repl_env.set(sym_key->symbol(), mal_data);
                 return mal_data;  // Prints def
         }
         std::cerr << "eval def";
@@ -70,7 +64,6 @@ mal::Data* eval_def(mal::List* uneval_list, mal::Environment& repl_env)
 mal::Data* eval_let(mal::List* uneval_list, mal::Environment& repl_env)
 {
         auto* new_env = new mal::Environment(&repl_env);
-        repl_env.set_inner(new_env);
 
         if (uneval_list->at(1)->type() == mal::Data::Type::List)
                 return eval_let_list(uneval_list, *new_env);
@@ -96,7 +89,7 @@ mal::Data* eval_if(mal::List* uneval_list, mal::Environment& repl_env)
         auto* condition  = uneval_list->at(1);
         auto* true_expr  = uneval_list->at(2);
         auto* false_expr = (uneval_list->size() > 3) ? uneval_list->at(3)
-                                                     : new mal::Nil(mal::Data::AllocType::Nude);
+                                                     : new mal::Nil();
         if (EVAL(condition, repl_env)->is_truthy())
                 return EVAL(true_expr, repl_env);
         return EVAL(false_expr, repl_env);
@@ -110,13 +103,13 @@ mal::Data* eval_fn(mal::List* uneval_list, mal::Environment& repl_env)
         auto  closure = [env_ptr, binds, body](const std::size_t argc,
                                               mal::Data* const* args)
             -> mal::Data* {
-                auto* exprs = new mal::FnList(mal::Data::AllocType::Nude);
+                auto* exprs = new mal::List();
                 for (size_t i = 0; i < argc; ++i)
                         exprs->push(args[i]);
                 auto* fn_env = new mal::Environment(env_ptr, binds, exprs);
                 return EVAL(body, *fn_env);
         };
-        return new mal::Function(closure, mal::Data::AllocType::Nude);
+        return new mal::Function(closure);
 }
 
 static mal::Data* eval_let_list(mal::List* uneval_list, mal::Environment& new_env)
@@ -128,9 +121,7 @@ static mal::Data* eval_let_list(mal::List* uneval_list, mal::Environment& new_en
                 assert(i + 1 < bindings->size());
                 if (auto* mal_data = EVAL(bindings->at(i + 1), new_env); mal_data)
                 {
-                        new_env.set(clone(sym_key)->symbol(), clone(mal_data));
-                        if (mal_data->alloc_type() == mal::Data::AllocType::Nude)
-                                delete mal_data;
+                        new_env.set(sym_key->symbol(), mal_data);
                 }
         }
         return EVAL(uneval_list->at(2), new_env);
@@ -145,45 +136,10 @@ static mal::Data* eval_let_vec(mal::List* uneval_list, mal::Environment& new_env
                 assert(i + 1 < bindings->size());
                 if (auto* mal_data = EVAL(bindings->at(i + 1), new_env); mal_data)
                 {
-                        new_env.set(clone(sym_key)->symbol(), clone(mal_data));
-                        if (mal_data->alloc_type() == mal::Data::AllocType::Nude)
-                                delete mal_data;
+                        new_env.set(sym_key->symbol(), mal_data);
                 }
         }
         return EVAL(uneval_list->at(2), new_env);
-}
-
-static mal::Data* clone(mal::Data* mal_data)
-{
-        // TODO(piyush) This leaks memory, which by all means, it shouldn't.
-        using mal::Data::AllocType::Clone;
-        switch (mal_data->type())
-        {
-                case mal::Data::Type::Symbol:  // Leak
-                        return new mal::Symbol(mal_data->symbol()->value(), Clone);
-                case mal::Data::Type::Integer:  // Leak
-                        return new mal::Integer(mal_data->integer()->value(), Clone);
-                case mal::Data::Type::List:  // This doesn't leak
-                {
-                        auto* clone_list = new mal::CloneList(Clone);
-                        for (auto& ptr : *mal_data->list())
-                        {
-                                clone_list->push(clone(ptr.get()));
-                        }
-                        return clone_list;
-                }
-                case mal::Data::Type::Vector:  // This also doesn't leak
-                {
-                        auto* clone_vec = new mal::CloneVector(Clone);
-                        for (auto& ptr : *mal_data->vector())
-                        {
-                                clone_vec->push(clone(ptr.get()));
-                        }
-                        return clone_vec;
-                }
-                default:
-                        return mal_data;
-        }
 }
 
 }  // namespace eval

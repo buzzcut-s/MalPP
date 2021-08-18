@@ -17,10 +17,7 @@ int main()
         {
                 auto out = rep(input, *repl_env);
                 std::cout << out << std::endl;
-
-                repl_env->clear_inner();
         }
-        repl_env->uninit();
 
         return 0;
 }

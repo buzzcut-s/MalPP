@@ -23,7 +23,7 @@ public:
             m_outer(outer)
         {}
 
-        explicit Environment(Environment* outer, mal::List* binds, mal::FnList* exprs);
+        explicit Environment(Environment* outer, mal::List* binds, mal::List* exprs);
 
         Environment(Environment const& other) = default;
         Environment& operator=(Environment const& other) = default;
@@ -34,12 +34,10 @@ public:
         auto begin() { return m_env.begin(); }
         auto end() { return m_env.end(); }
 
-        ~Environment();
+        ~Environment() = default;
 
         void init();
-        void uninit();
         void clear_inner();
-        void set_inner(Environment* inner) { m_inner = inner; }
         void set(const mal::Symbol* sym_key, mal::Data* mal_data);
 
         auto find_env(const mal::Symbol* sym_key) const -> const Environment*;

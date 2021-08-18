@@ -8,10 +8,9 @@ namespace mal
 {
 class Data;
 class Environment;
-using DataPtr = std::unique_ptr<mal::Data>;
 }  // namespace mal
 
-mal::DataPtr READ(std::string input);
+mal::Data* READ(std::string input);
 
 mal::Data* EVAL(mal::Data* ast, mal::Environment& repl_env);
 

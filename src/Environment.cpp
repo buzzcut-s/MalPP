@@ -9,7 +9,7 @@
 namespace mal
 {
 
-Environment::Environment(Environment* outer, mal::List* binds, mal::FnList* exprs) :
+Environment::Environment(Environment* outer, mal::List* binds, mal::List* exprs) :
     m_outer(outer)
 {
         assert(binds->size() == exprs->size());
@@ -21,22 +21,9 @@ Environment::Environment(Environment* outer, mal::List* binds, mal::FnList* expr
         }
 }
 
-Environment::~Environment()
-{
-        for (auto& [symbol_key, fn] : m_env)
-        {
-                if (fn && fn->alloc_type() == mal::Data::AllocType::Nude)
-                        delete fn;
-                if (symbol_key && symbol_key->alloc_type() == mal::Data::AllocType::Nude)
-                        delete symbol_key;
-        }
-        m_env.clear();
-}
-
 void Environment::init()
 {
         using Fn = std::function<mal::Data*(const std::size_t argc, mal::Data* const* args)>;
-        using mal::Data::AllocType::Nude;
 
         const Fn add_impl = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc == 2);
@@ -47,7 +34,7 @@ void Environment::init()
                 assert(rhs->type() == mal::Data::Type::Integer);
 
                 auto res = *lhs->integer() + *rhs->integer();
-                return new mal::Integer(res, Nude);
+                return new mal::Integer(res);
         };
 
         const Fn subtract_impl = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
@@ -59,7 +46,7 @@ void Environment::init()
                 assert(rhs->type() == mal::Data::Type::Integer);
 
                 auto res = *lhs->integer() - *rhs->integer();
-                return new mal::Integer(res, Nude);
+                return new mal::Integer(res);
         };
 
         const Fn multiply_impl = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
@@ -71,7 +58,7 @@ void Environment::init()
                 assert(rhs->type() == mal::Data::Type::Integer);
 
                 auto res = *lhs->integer() * *rhs->integer();
-                return new mal::Integer(res, Nude);
+                return new mal::Integer(res);
         };
 
         const Fn divide_impl = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
@@ -83,32 +70,13 @@ void Environment::init()
                 assert(rhs->type() == mal::Data::Type::Integer);
 
                 auto res = *lhs->integer() / *rhs->integer();
-                return new mal::Integer(res, Nude);
+                return new mal::Integer(res);
         };
 
-        using mal::Data::AllocType::Init;
-        set(new mal::Symbol("+", Init), new mal::Function(add_impl, Init));
-        set(new mal::Symbol("-", Init), new mal::Function(subtract_impl, Init));
-        set(new mal::Symbol("*", Init), new mal::Function(multiply_impl, Init));
-        set(new mal::Symbol("/", Init), new mal::Function(divide_impl, Init));
-}
-
-void Environment::uninit()
-{
-        for (auto& [symbol_key, fn] : m_env)
-        {
-                if (fn && fn->alloc_type() == mal::Data::AllocType::Init)
-                        delete fn;
-                if (symbol_key && symbol_key->alloc_type() == mal::Data::AllocType::Init)
-                        delete symbol_key;
-        }
-        m_env.clear();
-}
-
-void Environment::clear_inner()
-{
-        delete m_inner;
-        m_inner = nullptr;
+        set(new mal::Symbol("+"), new mal::Function(add_impl));
+        set(new mal::Symbol("-"), new mal::Function(subtract_impl));
+        set(new mal::Symbol("*"), new mal::Function(multiply_impl));
+        set(new mal::Symbol("/"), new mal::Function(divide_impl));
 }
 
 void Environment::set(const mal::Symbol* sym_key, mal::Data* mal_data)

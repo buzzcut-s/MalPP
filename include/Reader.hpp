@@ -10,8 +10,7 @@
 namespace mal
 {
 class Data;
-using DataPtr = std::unique_ptr<mal::Data>;
-}  // namespace mal
+}
 
 class Reader
 {
@@ -51,26 +50,26 @@ private:
 
 auto tokenize(std::string input) -> std::vector<std::string>;
 
-auto read_str(std::string input) -> mal::DataPtr;
+auto read_str(std::string input) -> mal::Data*;
 
-auto read_form(Reader& reader) -> mal::DataPtr;
+auto read_form(Reader& reader) -> mal::Data*;
 
-auto read_atom(Reader& reader) -> mal::DataPtr;
+auto read_atom(Reader& reader) -> mal::Data*;
 
-auto read_list(Reader& reader) -> mal::DataPtr;
+auto read_list(Reader& reader) -> mal::Data*;
 
-auto read_vector(Reader& reader) -> mal::DataPtr;
+auto read_vector(Reader& reader) -> mal::Data*;
 
-auto read_hashmap(Reader& reader) -> mal::DataPtr;
+auto read_hashmap(Reader& reader) -> mal::Data*;
 
-auto read_special_form(Reader& reader) -> mal::DataPtr;
+auto read_special_form(Reader& reader) -> mal::Data*;
 
-auto read_with_meta(Reader& reader) -> mal::DataPtr;
+auto read_with_meta(Reader& reader) -> mal::Data*;
 
-auto read_true(Reader& reader) -> mal::DataPtr;
+auto read_true(Reader& reader) -> mal::Data*;
 
-auto read_false(Reader& reader) -> mal::DataPtr;
+auto read_false(Reader& reader) -> mal::Data*;
 
-auto read_nil(Reader& reader) -> mal::DataPtr;
+auto read_nil(Reader& reader) -> mal::Data*;
 
 #endif  // READER_HPP
