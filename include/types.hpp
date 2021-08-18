@@ -50,7 +50,8 @@ public:
                 True,
                 False,
                 Nil,
-                Function
+                Function,
+                FnList
         };
 
         enum class AllocType
@@ -68,6 +69,8 @@ public:
         [[nodiscard]] AllocType alloc_type() const { return m_alloc; }
 
         [[nodiscard]] virtual Type type() const = 0;
+
+        [[nodiscard]] virtual bool is_truthy() const { return true; }
 
         Symbol*      symbol();
         List*        list();
@@ -145,6 +148,9 @@ public:
 
         [[nodiscard]] bool is_def() const { return m_symbol == "def!"; }
         [[nodiscard]] bool is_let() const { return m_symbol == "let*"; }
+        [[nodiscard]] bool is_do() const { return m_symbol == "do"; }
+        [[nodiscard]] bool is_if() const { return m_symbol == "if"; }
+        [[nodiscard]] bool is_fn() const { return m_symbol == "fn*"; }
 
 private:
         std::string m_symbol;
@@ -533,6 +539,8 @@ public:
         [[nodiscard]] std::string format() const override { return "false"; }
 
         [[nodiscard]] Type type() const override { return Type::False; }
+
+        [[nodiscard]] bool is_truthy() const override { return false; }
 };
 
 class Nil : public Data
@@ -558,6 +566,8 @@ public:
         }
 
         [[nodiscard]] Type type() const override { return Type::Nil; }
+
+        [[nodiscard]] bool is_truthy() const override { return false; }
 };
 
 class Function : public Data
@@ -580,7 +590,7 @@ public:
 
         ~Function() override = default;
 
-        [[nodiscard]] std::string format() const override { return "formatting function"; }
+        [[nodiscard]] std::string format() const override { return "#<function>"; }
 
         [[nodiscard]] Type type() const override { return Type::Function; }
 
@@ -593,6 +603,44 @@ public:
 
 private:
         const Fn m_fn{};
+};
+
+class FnList : public Data
+{
+public:
+        FnList() = delete;
+
+        explicit FnList(AllocType alloc = AllocType::Unique) :
+            Data(alloc)
+        {}
+
+        FnList(FnList const& other) = default;
+        FnList& operator=(FnList const& other) = default;
+
+        FnList(FnList&& other) = default;
+        FnList& operator=(FnList&& other) = default;
+
+        ~FnList() override = default;
+
+        [[nodiscard]] std::string format() const override { return "formatting fnlist"; }
+
+        [[nodiscard]] Type type() const override { return Type::FnList; }
+
+        auto begin() { return m_fn_list.begin(); }
+        auto end() { return m_fn_list.end(); }
+
+        auto front() { return m_fn_list.front(); }
+
+        void push(Data* value) { m_fn_list.push_back(value); }
+
+        [[nodiscard]] size_t size() const { return m_fn_list.size(); }
+
+        [[nodiscard]] mal::Data* at(std::size_t idx) const { return m_fn_list.at(idx); }
+
+        [[nodiscard]] auto data() const { return m_fn_list.data(); }
+
+private:
+        std::vector<Data*> m_fn_list;
 };
 
 }  // namespace mal

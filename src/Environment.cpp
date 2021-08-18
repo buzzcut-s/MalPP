@@ -9,6 +9,18 @@
 namespace mal
 {
 
+Environment::Environment(Environment* outer, mal::List* binds, mal::FnList* exprs) :
+    m_outer(outer)
+{
+        assert(binds->size() == exprs->size());
+        for (size_t i = 0; i < binds->size(); ++i)
+        {
+                auto* sym_key  = binds->at(i)->symbol();
+                auto* mal_data = exprs->at(i);
+                set(sym_key, mal_data);
+        }
+}
+
 Environment::~Environment()
 {
         for (auto& [symbol_key, fn] : m_env)

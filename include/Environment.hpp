@@ -23,6 +23,8 @@ public:
             m_outer(outer)
         {}
 
+        explicit Environment(Environment* outer, mal::List* binds, mal::FnList* exprs);
+
         Environment(Environment const& other) = default;
         Environment& operator=(Environment const& other) = default;
 
