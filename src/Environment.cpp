@@ -16,7 +16,39 @@ Environment::Environment(const Environment* outer, mal::List* binds, mal::List* 
         init_binds(binds, exprs);
 }
 
+Environment::Environment(const Environment* outer, mal::Vector* binds, mal::List* exprs) :
+    m_outer(outer)
+{
+        init_binds(binds, exprs);
+}
+
 void Environment::init_binds(mal::List* binds, mal::List* exprs)
+{
+        for (size_t i = 0; i < binds->size(); ++i)
+        {
+                auto* sym_key = binds->at(i)->symbol();
+                if (sym_key->is_variadic())
+                {
+                        if (i + 1 >= binds->size())
+                        {
+                                std::cerr << "missing symbol after &";
+                                return;
+                        }
+                        auto* var_key = binds->at(i + 1)->symbol();
+                        set_var_binds(var_key, exprs, i);
+                        return;
+                }
+                if (i >= exprs->size())
+                {
+                        std::cerr << "not enough arguments";
+                        return;
+                }
+                auto* mal_data = exprs->at(i);
+                set(sym_key, mal_data);
+        }
+}
+
+void Environment::init_binds(mal::Vector* binds, mal::List* exprs)
 {
         for (size_t i = 0; i < binds->size(); ++i)
         {

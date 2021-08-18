@@ -14,6 +14,10 @@ static mal::Data* eval_let_list(mal::List* uneval_list, mal::Environment& new_en
 
 static mal::Data* eval_let_vec(mal::List* uneval_list, mal::Environment& new_env);
 
+static mal::Data* eval_fn_list(mal::List* uneval_list, const mal::Environment& repl_env);
+
+static mal::Data* eval_fn_vec(mal::List* uneval_list, const mal::Environment& repl_env);
+
 mal::Data* eval_ast(mal::Data* ast, mal::Environment& repl_env)
 {
         switch (ast->type())
@@ -112,6 +116,44 @@ mal::Data* eval_if(mal::List* uneval_list, mal::Environment& repl_env)
 
 mal::Data* eval_fn(mal::List* uneval_list, const mal::Environment& repl_env)
 {
+        if (uneval_list->at(1)->type() == mal::Data::Type::List)
+                return eval_fn_list(uneval_list, repl_env);
+
+        if (uneval_list->at(1)->type() == mal::Data::Type::Vector)
+                return eval_fn_vec(uneval_list, repl_env);
+
+        std::cerr << "eval fn";
+        return nullptr;
+}
+
+static mal::Data* eval_let_list(mal::List* uneval_list, mal::Environment& new_env)
+{
+        auto* bindings = uneval_list->at(1)->list();
+        for (size_t i = 0; i < bindings->size(); i += 2)
+        {
+                auto* sym_key = bindings->at(i);
+                assert(i + 1 < bindings->size());
+                if (auto* mal_data = EVAL(bindings->at(i + 1), new_env); mal_data)
+                        new_env.set(sym_key->symbol(), mal_data);
+        }
+        return EVAL(uneval_list->at(2), new_env);
+}
+
+static mal::Data* eval_let_vec(mal::List* uneval_list, mal::Environment& new_env)
+{
+        auto* bindings = uneval_list->at(1)->vector();
+        for (size_t i = 0; i < bindings->size(); i += 2)
+        {
+                auto* sym_key = bindings->at(i);
+                assert(i + 1 < bindings->size());
+                if (auto* mal_data = EVAL(bindings->at(i + 1), new_env); mal_data)
+                        new_env.set(sym_key->symbol(), mal_data);
+        }
+        return EVAL(uneval_list->at(2), new_env);
+}
+
+static mal::Data* eval_fn_list(mal::List* uneval_list, const mal::Environment& repl_env)
+{
         auto* binds   = uneval_list->at(1)->list();
         auto* fn_body = uneval_list->at(2);
 
@@ -126,34 +168,20 @@ mal::Data* eval_fn(mal::List* uneval_list, const mal::Environment& repl_env)
         return new mal::Function(closure);
 }
 
-static mal::Data* eval_let_list(mal::List* uneval_list, mal::Environment& new_env)
+static mal::Data* eval_fn_vec(mal::List* uneval_list, const mal::Environment& repl_env)
 {
-        auto* bindings = uneval_list->at(1)->list();
-        for (size_t i = 0; i < bindings->size(); i += 2)
-        {
-                auto* sym_key = bindings->at(i);
-                assert(i + 1 < bindings->size());
-                if (auto* mal_data = EVAL(bindings->at(i + 1), new_env); mal_data)
-                {
-                        new_env.set(sym_key->symbol(), mal_data);
-                }
-        }
-        return EVAL(uneval_list->at(2), new_env);
-}
+        auto* binds   = uneval_list->at(1)->vector();
+        auto* fn_body = uneval_list->at(2);
 
-static mal::Data* eval_let_vec(mal::List* uneval_list, mal::Environment& new_env)
-{
-        auto* bindings = uneval_list->at(1)->vector();
-        for (size_t i = 0; i < bindings->size(); i += 2)
-        {
-                auto* sym_key = bindings->at(i);
-                assert(i + 1 < bindings->size());
-                if (auto* mal_data = EVAL(bindings->at(i + 1), new_env); mal_data)
-                {
-                        new_env.set(sym_key->symbol(), mal_data);
-                }
-        }
-        return EVAL(uneval_list->at(2), new_env);
+        auto closure = [&repl_env, binds, fn_body](const std::size_t argc, mal::Data* const* args)
+            -> mal::Data* {
+                auto* exprs = new mal::List;
+                for (size_t i = 0; i < argc; ++i)
+                        exprs->push(args[i]);
+                auto* fn_env = new mal::Environment(&repl_env, binds, exprs);
+                return EVAL(fn_body, *fn_env);
+        };
+        return new mal::Function(closure);
 }
 
 }  // namespace eval

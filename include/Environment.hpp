@@ -10,6 +10,7 @@ namespace mal
 {
 class Data;
 class List;
+class Vector;
 class Symbol;
 
 class Environment
@@ -22,6 +23,7 @@ public:
         {}
 
         Environment(const Environment* outer, mal::List* binds, mal::List* exprs);
+        Environment(const Environment* outer, mal::Vector* binds, mal::List* exprs);
 
         Environment(Environment const& other) = default;
         Environment& operator=(Environment const& other) = default;
@@ -44,6 +46,8 @@ public:
 
 private:
         void init_binds(mal::List* binds, mal::List* exprs);
+        void init_binds(mal::Vector* binds, mal::List* exprs);
+
         void set_var_binds(mal::Symbol* var_key, mal::List* var_exprs, size_t var_idx);
 
         struct FnHasher
