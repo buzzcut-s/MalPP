@@ -54,37 +54,15 @@ mal::Data* EVAL(mal::Data* ast, mal::Environment& repl_env)
                         }
                         if (special_form->is_do())
                         {
-                                mal::Data* result{};
-                                assert(uneval_list->size() > 1);
-                                for (size_t i = 1; i < uneval_list->size(); ++i)
-                                        result = eval::eval_ast(uneval_list->at(i), repl_env);
-                                return result;
+                                return eval::eval_do(uneval_list, repl_env);
                         }
                         if (special_form->is_if())
                         {
-                                auto* condition  = uneval_list->at(1);
-                                auto* true_expr  = uneval_list->at(2);
-                                auto* false_expr = (uneval_list->size() > 3) ? uneval_list->at(3)
-                                                                             : new mal::Nil(Nude);
-                                if (EVAL(condition, repl_env)->is_truthy())
-                                        return EVAL(true_expr, repl_env);
-                                return EVAL(false_expr, repl_env);
+                                return eval::eval_if(uneval_list, repl_env);
                         }
                         if (special_form->is_fn())
                         {
-                                auto* env_ptr = &repl_env;
-                                auto* binds   = uneval_list->at(1)->list();
-                                auto* body    = uneval_list->at(2);
-                                auto  closure = [env_ptr, binds, body](const std::size_t argc,
-                                                                      mal::Data* const* args)
-                                    -> mal::Data* {
-                                        auto* exprs = new mal::FnList(Nude);
-                                        for (size_t i = 0; i < argc; ++i)
-                                                exprs->push(args[i]);
-                                        auto* fn_env = new mal::Environment(env_ptr, binds, exprs);
-                                        return EVAL(body, *fn_env);
-                                };
-                                return new mal::Function(closure, Nude);
+                                return eval::eval_fn(uneval_list, repl_env);
                         }
                 }
                 default:

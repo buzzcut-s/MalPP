@@ -82,6 +82,43 @@ mal::Data* eval_let(mal::List* uneval_list, mal::Environment& repl_env)
         return nullptr;
 }
 
+mal::Data* eval_do(mal::List* uneval_list, mal::Environment& repl_env)
+{
+        mal::Data* result{};
+        assert(uneval_list->size() > 1);
+        for (size_t i = 1; i < uneval_list->size(); ++i)
+                result = eval::eval_ast(uneval_list->at(i), repl_env);
+        return result;
+}
+
+mal::Data* eval_if(mal::List* uneval_list, mal::Environment& repl_env)
+{
+        auto* condition  = uneval_list->at(1);
+        auto* true_expr  = uneval_list->at(2);
+        auto* false_expr = (uneval_list->size() > 3) ? uneval_list->at(3)
+                                                     : new mal::Nil(mal::Data::AllocType::Nude);
+        if (EVAL(condition, repl_env)->is_truthy())
+                return EVAL(true_expr, repl_env);
+        return EVAL(false_expr, repl_env);
+}
+
+mal::Data* eval_fn(mal::List* uneval_list, mal::Environment& repl_env)
+{
+        auto* env_ptr = &repl_env;
+        auto* binds   = uneval_list->at(1)->list();
+        auto* body    = uneval_list->at(2);
+        auto  closure = [env_ptr, binds, body](const std::size_t argc,
+                                              mal::Data* const* args)
+            -> mal::Data* {
+                auto* exprs = new mal::FnList(mal::Data::AllocType::Nude);
+                for (size_t i = 0; i < argc; ++i)
+                        exprs->push(args[i]);
+                auto* fn_env = new mal::Environment(env_ptr, binds, exprs);
+                return EVAL(body, *fn_env);
+        };
+        return new mal::Function(closure, mal::Data::AllocType::Nude);
+}
+
 static mal::Data* eval_let_list(mal::List* uneval_list, mal::Environment& new_env)
 {
         auto* bindings = uneval_list->at(1)->list();
