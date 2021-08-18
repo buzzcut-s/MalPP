@@ -77,6 +77,7 @@ std::unordered_map<std::string, Fn> ns_init()
 
         Fn list_q = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc >= 1);
+
                 if (args[0]->type() == mal::Data::Type::List)
                         return new mal::True;
                 return new mal::False;
@@ -84,15 +85,22 @@ std::unordered_map<std::string, Fn> ns_init()
 
         Fn empty_q = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc >= 1);
+
                 if (args[0]->type() == mal::Data::Type::List && args[0]->list()->empty())
+                        return new mal::True;
+                if (args[0]->type() == mal::Data::Type::Vector && args[0]->vector()->empty())
                         return new mal::True;
                 return new mal::False;
         };
 
         Fn count = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc >= 1);
+
                 if (args[0]->type() == mal::Data::Type::List)
                         return new mal::Integer(args[0]->list()->size());
+                if (args[0]->type() == mal::Data::Type::Vector)
+                        return new mal::Integer(args[0]->vector()->size());
+
                 return new mal::Integer(0);
         };
 

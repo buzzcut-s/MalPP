@@ -1,5 +1,9 @@
 #include "../../include/types/List.hpp"
 
+#include <iostream>
+
+#include "../../include/types/Vector.hpp"
+
 namespace mal
 {
 
@@ -22,16 +26,36 @@ std::string List::format() const
 
 bool List::operator==(Data* rhs)
 {
-        if (rhs->type() != mal::Data::Type::List)
-                return false;
-        if (this->size() != rhs->list()->size())
-                return false;
-        for (size_t i = 0; i < this->size(); ++i)
+        switch (rhs->type())
         {
-                if (*this->at(i) != rhs->list()->at(i))
+                case mal::Data::Type::List:
+                {
+                        if (this->size() != rhs->list()->size())
+                                return false;
+                        for (size_t i = 0; i < this->size(); ++i)
+                        {
+                                if (*this->at(i) != rhs->list()->at(i))
+                                        return false;
+                        }
+                        return true;
+                }
+                case mal::Data::Type::Vector:
+                {
+                        if (this->size() != rhs->vector()->size())
+                                return false;
+                        for (size_t i = 0; i < this->size(); ++i)
+                        {
+                                if (*this->at(i) != rhs->vector()->at(i))
+                                        return false;
+                        }
+                        return true;
+                }
+                default:
+                {
+                        std::cerr << "list operator== default return\n";
                         return false;
+                }
         }
-        return true;
 }
 
 }  // namespace mal

@@ -26,6 +26,8 @@ public:
 
         [[nodiscard]] Type type() const override { return Type::Vector; }
 
+        bool operator==(Data* rhs) override;
+
         auto begin() { return m_vec.begin(); }
         auto end() { return m_vec.end(); }
 
