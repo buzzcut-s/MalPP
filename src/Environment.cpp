@@ -9,6 +9,8 @@
 namespace mal
 {
 
+using Fn = std::function<mal::Data*(const std::size_t argc, mal::Data* const* args)>;
+
 Environment::Environment(const Environment* outer, mal::List* binds, mal::List* exprs) :
     m_outer(outer)
 {
@@ -21,62 +23,10 @@ Environment::Environment(const Environment* outer, mal::List* binds, mal::List* 
         }
 }
 
-void Environment::init()
+void Environment::init(std::unordered_map<std::string, Fn> core_ns)
 {
-        using Fn = std::function<mal::Data*(const std::size_t argc, mal::Data* const* args)>;
-
-        const Fn add_impl = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
-                assert(argc == 2);
-                const auto& lhs = args[0];
-                const auto& rhs = args[1];
-
-                assert(lhs->type() == mal::Data::Type::Integer);
-                assert(rhs->type() == mal::Data::Type::Integer);
-
-                auto res = *lhs->integer() + *rhs->integer();
-                return new mal::Integer(res);
-        };
-
-        const Fn subtract_impl = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
-                assert(argc == 2);
-                const auto& lhs = args[0];
-                const auto& rhs = args[1];
-
-                assert(lhs->type() == mal::Data::Type::Integer);
-                assert(rhs->type() == mal::Data::Type::Integer);
-
-                auto res = *lhs->integer() - *rhs->integer();
-                return new mal::Integer(res);
-        };
-
-        const Fn multiply_impl = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
-                assert(argc == 2);
-                const auto& lhs = args[0];
-                const auto& rhs = args[1];
-
-                assert(lhs->type() == mal::Data::Type::Integer);
-                assert(rhs->type() == mal::Data::Type::Integer);
-
-                auto res = *lhs->integer() * *rhs->integer();
-                return new mal::Integer(res);
-        };
-
-        const Fn divide_impl = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
-                assert(argc == 2);
-                const auto& lhs = args[0];
-                const auto& rhs = args[1];
-
-                assert(lhs->type() == mal::Data::Type::Integer);
-                assert(rhs->type() == mal::Data::Type::Integer);
-
-                auto res = *lhs->integer() / *rhs->integer();
-                return new mal::Integer(res);
-        };
-
-        set(new mal::Symbol("+"), new mal::Function(add_impl));
-        set(new mal::Symbol("-"), new mal::Function(subtract_impl));
-        set(new mal::Symbol("*"), new mal::Function(multiply_impl));
-        set(new mal::Symbol("/"), new mal::Function(divide_impl));
+        for (const auto& [sym_key, mal_fn] : core_ns)
+                set(new mal::Symbol(sym_key), new mal::Function(mal_fn));
 }
 
 void Environment::set(const mal::Symbol* sym_key, mal::Data* mal_data)

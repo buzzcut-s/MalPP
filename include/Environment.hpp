@@ -36,7 +36,9 @@ public:
 
         ~Environment() = default;
 
-        void init();
+        using Fn = std::function<mal::Data*(const std::size_t argc, mal::Data* const* args)>;
+        void init(std::unordered_map<std::string, Fn> core_ns);
+
         void set(const mal::Symbol* sym_key, mal::Data* mal_data);
 
         auto find_env(const mal::Symbol* sym_key) const -> const Environment*;

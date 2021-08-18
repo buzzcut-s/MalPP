@@ -34,4 +34,6 @@ add_executable(
   include/Environment.hpp
   src/Environment.cpp
   include/eval.hpp
-  src/eval.cpp)
+  src/eval.cpp
+  include/core.hpp
+  src/core.cpp)

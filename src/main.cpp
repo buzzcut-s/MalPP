@@ -2,6 +2,7 @@
 #include <string>
 
 #include "../include/Environment.hpp"
+#include "../include/core.hpp"
 #include "../include/mal.hpp"
 #include "../include/readline.hpp"
 
@@ -12,7 +13,9 @@ int main()
         std::string input;
         const auto  repl_env = std::make_unique<mal::Environment>(OUTER);
 
-        repl_env->init();
+        auto core_ns = core::ns_init();
+        repl_env->init(std::move(core_ns));
+
         while (readline::read(input))
         {
                 auto out = rep(input, *repl_env);
