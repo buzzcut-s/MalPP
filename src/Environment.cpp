@@ -84,8 +84,17 @@ void Environment::set_var_binds(mal::Symbol* var_key, mal::List* var_exprs, size
 
 void Environment::init(std::unordered_map<std::string, Fn> core_ns)
 {
-        for (const auto& [sym_key, mal_fn] : core_ns)
-                set(new mal::Symbol(sym_key), new mal::Function(mal_fn));
+        for (const auto& [core_key, core_fn] : core_ns)
+                set(new mal::Symbol(core_key), new mal::Function(core_fn));
+}
+
+void Environment::uninit()
+{
+        for (auto [core_key, core_fn] : m_env)
+        {
+                delete core_key;
+                delete core_fn;
+        }
 }
 
 void Environment::set(const mal::Symbol* sym_key, mal::Data* mal_data)

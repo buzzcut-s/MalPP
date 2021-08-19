@@ -22,5 +22,6 @@ int main()
                 std::cout << out << std::endl;
         }
 
+        repl_env->uninit();
         return 0;
 }
