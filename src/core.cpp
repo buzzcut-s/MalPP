@@ -11,7 +11,7 @@ namespace core
 
 std::unordered_map<std::string, Fn> ns_init()
 {
-        Fn add = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
+        Fn core_add = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc == 2);
                 const auto& lhs = args[0];
                 const auto& rhs = args[1];
@@ -23,7 +23,7 @@ std::unordered_map<std::string, Fn> ns_init()
                 return new mal::Integer(res);
         };
 
-        Fn subtract = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
+        Fn core_subtract = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc == 2);
                 const auto& lhs = args[0];
                 const auto& rhs = args[1];
@@ -35,7 +35,7 @@ std::unordered_map<std::string, Fn> ns_init()
                 return new mal::Integer(res);
         };
 
-        Fn multiply = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
+        Fn core_multiply = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc == 2);
                 const auto& lhs = args[0];
                 const auto& rhs = args[1];
@@ -47,7 +47,7 @@ std::unordered_map<std::string, Fn> ns_init()
                 return new mal::Integer(res);
         };
 
-        Fn divide = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
+        Fn core_divide = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc == 2);
                 const auto& lhs = args[0];
                 const auto& rhs = args[1];
@@ -59,7 +59,7 @@ std::unordered_map<std::string, Fn> ns_init()
                 return new mal::Integer(res);
         };
 
-        Fn prn = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
+        Fn core_prn = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 if (argc < 1)
                         std::cout << "\n";
                 else
@@ -68,14 +68,14 @@ std::unordered_map<std::string, Fn> ns_init()
                 return new mal::Nil;
         };
 
-        Fn list = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
+        Fn core_list = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 auto* list = new mal::List;
                 for (size_t i = 0; i < argc; ++i)
                         list->push(args[i]);
                 return list;
         };
 
-        Fn list_q = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
+        Fn core_list_q = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc >= 1);
 
                 if (args[0]->type() == mal::Data::Type::List)
@@ -83,7 +83,7 @@ std::unordered_map<std::string, Fn> ns_init()
                 return new mal::False;
         };
 
-        Fn empty_q = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
+        Fn core_empty_q = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc >= 1);
 
                 if (args[0]->type() == mal::Data::Type::List && args[0]->list()->empty())
@@ -93,7 +93,7 @@ std::unordered_map<std::string, Fn> ns_init()
                 return new mal::False;
         };
 
-        Fn count = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
+        Fn core_count = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc >= 1);
 
                 if (args[0]->type() == mal::Data::Type::List)
@@ -104,7 +104,7 @@ std::unordered_map<std::string, Fn> ns_init()
                 return new mal::Integer(0);
         };
 
-        Fn eq = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
+        Fn core_eq = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc == 2);
                 const auto& lhs = args[0];
                 const auto& rhs = args[1];
@@ -114,7 +114,7 @@ std::unordered_map<std::string, Fn> ns_init()
                 return new mal::False;
         };
 
-        Fn lt = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
+        Fn core_lt = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc == 2);
                 const auto& lhs = args[0];
                 const auto& rhs = args[1];
@@ -127,7 +127,7 @@ std::unordered_map<std::string, Fn> ns_init()
                 return new mal::False;
         };
 
-        Fn lte = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
+        Fn core_lte = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc == 2);
                 const auto& lhs = args[0];
                 const auto& rhs = args[1];
@@ -140,7 +140,7 @@ std::unordered_map<std::string, Fn> ns_init()
                 return new mal::False;
         };
 
-        Fn gt = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
+        Fn core_gt = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc == 2);
                 const auto& lhs = args[0];
                 const auto& rhs = args[1];
@@ -153,7 +153,7 @@ std::unordered_map<std::string, Fn> ns_init()
                 return new mal::False;
         };
 
-        Fn gte = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
+        Fn core_gte = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc == 2);
                 const auto& lhs = args[0];
                 const auto& rhs = args[1];
@@ -176,20 +176,20 @@ std::unordered_map<std::string, Fn> ns_init()
         };
 
         std::unordered_map<std::string, Fn> core_ns{
-            {"+", std::move(add)},
-            {"-", std::move(subtract)},
-            {"*", std::move(multiply)},
-            {"/", std::move(divide)},
-            {"prn", std::move(prn)},
-            {"list", std::move(list)},
-            {"list?", std::move(list_q)},
-            {"empty?", std::move(empty_q)},
-            {"count", std::move(count)},
-            {"=", std::move(eq)},
-            {"<", std::move(lt)},
-            {"<=", std::move(lte)},
-            {">", std::move(gt)},
-            {">=", std::move(gte)},
+            {"+", std::move(core_add)},
+            {"-", std::move(core_subtract)},
+            {"*", std::move(core_multiply)},
+            {"/", std::move(core_divide)},
+            {"prn", std::move(core_prn)},
+            {"list", std::move(core_list)},
+            {"list?", std::move(core_list_q)},
+            {"empty?", std::move(core_empty_q)},
+            {"count", std::move(core_count)},
+            {"=", std::move(core_eq)},
+            {"<", std::move(core_lt)},
+            {"<=", std::move(core_lte)},
+            {">", std::move(core_gt)},
+            {">=", std::move(core_gte)},
             {"not", std::move(core_not)},
         };
 
