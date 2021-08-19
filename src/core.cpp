@@ -166,6 +166,15 @@ std::unordered_map<std::string, Fn> ns_init()
                 return new mal::False;
         };
 
+        Fn core_not = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
+                assert(argc >= 1);
+                const auto& condition = args[0];
+
+                if (condition->is_truthy())
+                        return new mal::False;
+                return new mal::True;
+        };
+
         std::unordered_map<std::string, Fn> core_ns{
             {"+", std::move(add)},
             {"-", std::move(subtract)},
@@ -181,6 +190,7 @@ std::unordered_map<std::string, Fn> ns_init()
             {"<=", std::move(lte)},
             {">", std::move(gt)},
             {">=", std::move(gte)},
+            {"not", std::move(core_not)},
         };
 
         return core_ns;
