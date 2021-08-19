@@ -38,7 +38,7 @@ public:
 
         [[nodiscard]] size_t size() const { return m_list.size(); }
         [[nodiscard]] bool   empty() const { return m_list.empty(); }
-        [[nodiscard]] auto   at(std::size_t idx) const { return m_list.at(idx); }
+        [[nodiscard]] auto   at(std::size_t idx) const -> mal::Data* { return m_list.at(idx); }
 
 private:
         std::vector<mal::Data*> m_list;

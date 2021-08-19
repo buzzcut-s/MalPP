@@ -39,10 +39,10 @@ public:
                 Integer,
                 Keyword,
                 String,
+                Function,
                 True,
                 False,
                 Nil,
-                Function,
         };
 
         [[nodiscard]] virtual Type type() const = 0;

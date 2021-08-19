@@ -31,19 +31,19 @@ public:
         Environment(Environment&& other) = default;
         Environment& operator=(Environment&& other) = default;
 
-        auto begin() { return m_env.begin(); }
-        auto end() { return m_env.end(); }
-
         ~Environment() = default;
 
-        using Fn = std::function<mal::Data*(const std::size_t argc, mal::Data* const* args)>;
-        void init(std::unordered_map<std::string, Fn> core_ns);
-        void uninit();
+        auto begin() { return m_env.begin(); }
+        auto end() { return m_env.end(); }
 
         void set(const mal::Symbol* sym_key, mal::Data* mal_data);
 
         auto find_env(const mal::Symbol* sym_key) const -> const Environment*;
         auto lookup(const mal::Symbol* sym_key) const -> mal::Data*;
+
+        using Fn = std::function<mal::Data*(const std::size_t argc, mal::Data* const* args)>;
+        void init(std::unordered_map<std::string, Fn> core_ns);
+        void uninit();
 
 private:
         void init_binds(mal::List* binds, mal::List* exprs);
@@ -53,7 +53,7 @@ private:
 
         struct FnHasher
         {
-                std::size_t operator()(const mal::Symbol* sym_key) const noexcept;
+                size_t operator()(const mal::Symbol* sym_key) const noexcept;
         };
 
         struct FnPred

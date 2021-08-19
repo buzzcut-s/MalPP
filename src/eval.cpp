@@ -48,6 +48,7 @@ mal::Data* eval_ast(mal::Data* ast, mal::Environment& repl_env)
                                 eval_map->insert(key, EVAL(val, repl_env));
                         return eval_map;
                 }
+
                 default:
                         return ast;
         }
@@ -61,7 +62,7 @@ mal::Data* eval_apply(mal::Data* ast, mal::Environment& repl_env)
                 auto* mal_fn = args->front()->function();
                 return mal_fn->apply(args->size() - 1, args->data() + 1);
         }
-        std::cerr << "EVAL apply - from EVAL default";
+        std::cerr << "eval apply - from EVAL default\n";
         return nullptr;
 }
 
@@ -73,7 +74,7 @@ mal::Data* eval_def(mal::List* uneval_list, mal::Environment& repl_env)
                 repl_env.set(sym_key->symbol(), mal_data);
                 return mal_data;  // Prints def
         }
-        std::cerr << "eval def";
+        std::cerr << "eval def\n";
         return nullptr;
 }
 
@@ -87,7 +88,7 @@ mal::Data* eval_let(mal::List* uneval_list, mal::Environment& repl_env)
         if (uneval_list->at(1)->type() == mal::Data::Type::Vector)
                 return eval_let_vec(uneval_list, *new_env);
 
-        std::cerr << "eval let";
+        std::cerr << "eval let\n";
         return nullptr;
 }
 
@@ -122,7 +123,7 @@ mal::Data* eval_fn(mal::List* uneval_list, const mal::Environment& repl_env)
         if (uneval_list->at(1)->type() == mal::Data::Type::Vector)
                 return eval_fn_vec(uneval_list, repl_env);
 
-        std::cerr << "eval fn";
+        std::cerr << "eval fn\n";
         return nullptr;
 }
 

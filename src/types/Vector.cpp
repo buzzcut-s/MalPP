@@ -26,6 +26,7 @@ std::string Vector::format() const
 
 bool Vector::operator==(Data* rhs)
 {
+        // TODO(piyush) Check for nullptr
         switch (rhs->type())
         {
                 case mal::Data::Type::List:
@@ -39,6 +40,7 @@ bool Vector::operator==(Data* rhs)
                         }
                         return true;
                 }
+
                 case mal::Data::Type::Vector:
                 {
                         if (this->size() != rhs->vector()->size())
@@ -50,6 +52,7 @@ bool Vector::operator==(Data* rhs)
                         }
                         return true;
                 }
+
                 default:
                 {
                         std::cerr << "vector operator== default return\n";

@@ -26,6 +26,7 @@ std::string List::format() const
 
 bool List::operator==(Data* rhs)
 {
+        // TODO(piyush) Check for nullptr
         switch (rhs->type())
         {
                 case mal::Data::Type::List:
@@ -39,6 +40,7 @@ bool List::operator==(Data* rhs)
                         }
                         return true;
                 }
+
                 case mal::Data::Type::Vector:
                 {
                         if (this->size() != rhs->vector()->size())
@@ -50,6 +52,7 @@ bool List::operator==(Data* rhs)
                         }
                         return true;
                 }
+
                 default:
                 {
                         std::cerr << "list operator== default return\n";

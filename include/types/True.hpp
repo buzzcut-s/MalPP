@@ -25,6 +25,7 @@ public:
 
         [[nodiscard]] Type type() const override { return Type::True; }
 
+        // TODO(piyush) Check for nullptr
         bool operator==(Data* rhs) override { return rhs->type() == Type::True; }
 };
 

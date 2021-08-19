@@ -31,7 +31,7 @@ void Environment::init_binds(mal::List* binds, mal::List* exprs)
                 {
                         if (i + 1 >= binds->size())
                         {
-                                std::cerr << "missing symbol after &";
+                                std::cerr << "missing symbol after &\n";
                                 return;
                         }
                         auto* var_key = binds->at(i + 1)->symbol();
@@ -40,7 +40,7 @@ void Environment::init_binds(mal::List* binds, mal::List* exprs)
                 }
                 if (i >= exprs->size())
                 {
-                        std::cerr << "not enough arguments";
+                        std::cerr << "not enough arguments\n";
                         return;
                 }
                 auto* mal_data = exprs->at(i);
@@ -57,7 +57,7 @@ void Environment::init_binds(mal::Vector* binds, mal::List* exprs)
                 {
                         if (i + 1 >= binds->size())
                         {
-                                std::cerr << "missing symbol after &";
+                                std::cerr << "missing symbol after &\n";
                                 return;
                         }
                         auto* var_key = binds->at(i + 1)->symbol();
@@ -66,7 +66,7 @@ void Environment::init_binds(mal::Vector* binds, mal::List* exprs)
                 }
                 if (i >= exprs->size())
                 {
-                        std::cerr << "not enough arguments";
+                        std::cerr << "not enough arguments\n";
                         return;
                 }
                 auto* mal_data = exprs->at(i);
@@ -117,7 +117,7 @@ auto Environment::lookup(const mal::Symbol* sym_key) const -> mal::Data*
                 return env->m_env.at(sym_key);
 
         // TODO(piyush) Handle an exception here
-        std::cerr << "'" << sym_key->value() << "' not found";
+        std::cerr << "'" << sym_key->value() << "' not found\n";
         return nullptr;
 }
 

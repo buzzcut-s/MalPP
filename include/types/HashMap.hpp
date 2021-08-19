@@ -40,7 +40,7 @@ public:
 private:
         struct DataHasher
         {
-                std::size_t operator()(const mal::Data* key) const noexcept;
+                size_t operator()(const mal::Data* key) const noexcept;
         };
 
         struct DataPred

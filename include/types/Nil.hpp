@@ -27,6 +27,7 @@ public:
 
         [[nodiscard]] bool is_truthy() const override { return false; }
 
+        // TODO(piyush) Check for nullptr
         bool operator==(Data* rhs) override { return rhs->type() == Type::Nil; }
 };
 

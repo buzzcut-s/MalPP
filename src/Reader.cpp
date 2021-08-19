@@ -56,7 +56,7 @@ auto tokenize(std::string input) -> std::vector<std::string>
                         if (token.size() == 1 || token.back() != '"'
                             || (token[token.size() - 2] == '\\' && escape_count % 2 != 0))
                         {
-                                std::cerr << "unbalanced";
+                                std::cerr << "unbalanced\n";
                         }
                         else
                         {
@@ -148,7 +148,7 @@ auto read_list(Reader& reader) -> mal::Data*
                 list->push(read_form(reader));
         }
 
-        std::cerr << "unbalanced";
+        std::cerr << "unbalanced\n";
         return nullptr;
 }
 
@@ -167,7 +167,7 @@ auto read_vector(Reader& reader) -> mal::Data*
                 vec->push(read_form(reader));
         }
 
-        std::cerr << "unbalanced";
+        std::cerr << "unbalanced\n";
         return nullptr;
 }
 
@@ -198,7 +198,7 @@ auto read_hashmap(Reader& reader) -> mal::Data*
                 hashmap->insert(key, value);
         }
 
-        std::cerr << "unbalanced";
+        std::cerr << "unbalanced\n";
         return nullptr;
 }
 
@@ -230,7 +230,7 @@ auto read_special_form(Reader& reader) -> mal::Data*
                 return special_list;
         }
 
-        std::cerr << "unbalanced";
+        std::cerr << "unbalanced\n";
         return nullptr;
 }
 
@@ -249,7 +249,7 @@ auto read_with_meta(Reader& reader) -> mal::Data*
                 return metadata_list;
         }
 
-        std::cerr << "unbalanced";
+        std::cerr << "unbalanced\n";
         return nullptr;
 }
 

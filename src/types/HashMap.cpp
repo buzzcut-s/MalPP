@@ -24,17 +24,25 @@ std::string HashMap::format() const
 
 bool HashMap::operator==(Data* rhs)
 {
-        if (rhs->type() != mal::Data::Type::HashMap)
-                return false;
-        if (this->size() != rhs->hashmap()->size())
-                return false;
-        for (auto [this_key, this_val] : *this)
+        // TODO(piyush) Check for nullptr
+        switch (rhs->type())
         {
-                auto* rhs_val = rhs->hashmap()->find(this_key);
-                if (!rhs_val || *rhs_val != this_val)
+                case mal::Data::Type::HashMap:
+                {
+                        if (this->size() != rhs->hashmap()->size())
+                                return false;
+                        for (auto [this_key, this_val] : *this)
+                        {
+                                auto* rhs_val = rhs->hashmap()->find(this_key);
+                                if (!rhs_val || *rhs_val != this_val)
+                                        return false;
+                        }
+                        return true;
+                }
+
+                default:
                         return false;
         }
-        return true;
 }
 
 auto HashMap::find(mal::Data* key) const -> mal::Data*
