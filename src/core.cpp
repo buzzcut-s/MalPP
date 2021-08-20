@@ -9,6 +9,8 @@
 namespace core
 {
 
+// Returns MAL core environment, used to construct our outermost mal env in main
+
 std::unordered_map<std::string, Fn> ns_init()
 {
         Fn core_add = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
@@ -59,6 +61,8 @@ std::unordered_map<std::string, Fn> ns_init()
                 return new mal::Integer(res);
         };
 
+        // call pr_str on the first parameter
+        // prints the result to the screen and then return nil
         Fn core_prn = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 if (argc < 1)
                         std::cout << "\n";
@@ -68,6 +72,7 @@ std::unordered_map<std::string, Fn> ns_init()
                 return new mal::Nil;
         };
 
+        // take the parameters and return them as a list
         Fn core_list = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 auto* list = new mal::List;
                 for (size_t i = 0; i < argc; ++i)
@@ -75,6 +80,7 @@ std::unordered_map<std::string, Fn> ns_init()
                 return list;
         };
 
+        // return true if the first parameter is a list, false otherwise
         Fn core_list_q = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc >= 1);
 
@@ -83,6 +89,7 @@ std::unordered_map<std::string, Fn> ns_init()
                 return new mal::False;
         };
 
+        // treat the first parameter as a list (or vector) and return true if the list is empty
         Fn core_empty_q = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc >= 1);
 
@@ -93,6 +100,8 @@ std::unordered_map<std::string, Fn> ns_init()
                 return new mal::False;
         };
 
+        // treat the first parameter as a list (or vector)
+        // return the number of elements that it contains
         Fn core_count = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc >= 1);
 
@@ -104,6 +113,9 @@ std::unordered_map<std::string, Fn> ns_init()
                 return new mal::Integer(0);
         };
 
+        // compare the first two parameters
+        // return true if they are the same type and contain the same value
+        // in the case of equal length lists, each element of the list is compared for equality
         Fn core_eq = [](const size_t argc, mal::Data* const* args) -> mal::Data* {
                 assert(argc == 2);
                 const auto& lhs = args[0];

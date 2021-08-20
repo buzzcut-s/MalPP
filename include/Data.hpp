@@ -15,6 +15,7 @@ class Keyword;
 class String;
 class Function;
 
+// abstract base class for all MAL types
 class Data
 {
 public:

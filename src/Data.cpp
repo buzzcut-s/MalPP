@@ -4,6 +4,9 @@
 
 #include "../include/types.hpp"
 
+// assert and cast helpers
+// wish i knew better.
+
 namespace mal
 {
 

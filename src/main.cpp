@@ -1,10 +1,10 @@
 #include <iostream>
 #include <string>
 
-#include "../include/Environment.hpp"
-#include "../include/core.hpp"
-#include "../include/mal.hpp"
-#include "../include/readline.hpp"
+#include "../include/Environment.hpp"  // MalPP environment
+#include "../include/core.hpp"         // MAL core functions
+#include "../include/mal.hpp"          // REPL support
+#include "../include/readline.hpp"     // linenoise
 
 constexpr auto OUTER = nullptr;
 

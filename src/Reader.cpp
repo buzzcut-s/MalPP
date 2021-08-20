@@ -35,6 +35,7 @@ void Reader::consume()
         if (!eof()) ++m_index;
 }
 
+// returns a vector of tokens (strings)
 auto tokenize(std::string input) -> std::vector<std::string>
 {
         static const auto TOKEN_REGEX =
@@ -81,6 +82,7 @@ auto read_str(std::string input) -> mal::Data*
         return read_form(reader);
 }
 
+// calls the necessary reader for each token type
 auto read_form(Reader& reader) -> mal::Data*
 {
         const auto token = reader.peek();
@@ -130,6 +132,7 @@ auto read_atom(Reader& reader) -> mal::Data*
                 return new (mal::Integer)(int_val);
         }
 
+        // if not string and not number, then it's a symbol
         return new (mal::Symbol)(token_val);
 }
 
@@ -215,6 +218,7 @@ auto read_special_form(Reader& reader) -> mal::Data*
                 special_list->push(new (mal::Symbol)("quasiquote"));
         else if (type == '~')
         {
+                //  unquoted token is ~, splice unquoted token is ~@
                 const bool unquoted = (token.value().length() == 1);
                 if (unquoted)
                         special_list->push(new (mal::Symbol)("unquote"));
@@ -224,6 +228,7 @@ auto read_special_form(Reader& reader) -> mal::Data*
         else if (type == '@')
                 special_list->push(new (mal::Symbol)("deref"));
 
+        // check to make sure there is a following token
         if (auto* val = read_form(reader); val)
         {
                 special_list->push(val);
@@ -264,17 +269,17 @@ auto read_keyword(Reader& reader) -> mal::Data*
 auto read_true(Reader& reader) -> mal::Data*
 {
         reader.consume();
-        return new (mal::True)();
+        return new (mal::True);
 }
 
 auto read_false(Reader& reader) -> mal::Data*
 {
         reader.consume();
-        return new (mal::False)();
+        return new (mal::False);
 }
 
 auto read_nil(Reader& reader) -> mal::Data*
 {
         reader.consume();
-        return new (mal::Nil)();
+        return new (mal::Nil);
 }
